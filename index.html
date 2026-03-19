@@ -24,7 +24,7 @@ canvas {
     border-radius: 12px;
 }
 
-/* верх панель */
+/* верх */
 #topBar {
     margin-bottom: 10px;
 }
@@ -61,22 +61,16 @@ button:active {
     border-radius: 12px;
     padding: 10px;
     margin-top: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
 #shop.active {
     display: block;
 }
 
-/* моб кнопки */
+/* моб */
 #mobileControls {
     display: none;
     margin-top: 10px;
-}
-
-.mobileBtn {
-    padding: 12px 20px;
-    font-size: 18px;
 }
 </style>
 </head>
@@ -87,7 +81,6 @@ button:active {
 
 <div id="topBar">
     <button onclick="showMenu()">🏠 Home</button>
-    <button onclick="startGame()">▶ Restart</button>
     <button onclick="toggleShop()">🛒 Shop</button>
     <button onclick="toggleMode()">📱 Mode</button>
     <span id="coins"></span>
@@ -116,18 +109,13 @@ button:active {
     <button id="bg_day" onclick="buyBg('day',0)">День (0)</button>
     <button id="bg_desert" onclick="buyBg('desert',80)">Пустеля (80)</button>
     <button id="bg_forest" onclick="buyBg('forest',120)">Ліс (120)</button>
-
-    <hr>
-
-    <input id="promoInput" placeholder="код">
-    <button onclick="usePromo()">OK</button>
 </div>
 
 <canvas id="game" width="800" height="200" style="display:none;"></canvas>
 
 <div id="mobileControls">
-    <button class="mobileBtn" onclick="jump()">⬆️</button>
-    <button class="mobileBtn" onclick="duck(true)">⬇️</button>
+    <button onclick="jump()">⬆️</button>
+    <button onclick="duck(true)">⬇️</button>
 </div>
 
 </div>
@@ -151,12 +139,12 @@ let currentSkin = localStorage.getItem("skin") || "black";
 let ownedBg = JSON.parse(localStorage.getItem("ownedBg")) || ["day"];
 let ownedSkins = JSON.parse(localStorage.getItem("ownedSkins")) || ["black"];
 
+updateCoins();
 updateShopUI();
 
 function updateCoins(){
     document.getElementById("coins").innerText = "Coins: " + coins;
 }
-updateCoins();
 
 /* 🛒 */
 function toggleShop(){
@@ -166,14 +154,14 @@ function toggleShop(){
 function updateShopUI(){
     ["black","green","red"].forEach(s=>{
         if(ownedSkins.includes(s)){
-            document.getElementById("skin_"+s)?.classList.add("bought");
+            document.getElementById("skin_"+s).classList.add("bought");
             document.getElementById("skin_"+s).innerText="КУПЛЕНО";
         }
     });
 
     ["day","desert","forest"].forEach(b=>{
         if(ownedBg.includes(b)){
-            document.getElementById("bg_"+b)?.classList.add("bought");
+            document.getElementById("bg_"+b).classList.add("bought");
             document.getElementById("bg_"+b).innerText="КУПЛЕНО";
         }
     });
@@ -238,9 +226,7 @@ document.addEventListener("keydown",(e)=>{
     if(e.key==="ArrowUp" && dino.grounded) jump();
     if(e.key==="ArrowDown") duck(true);
 
-    if(gameOver){
-        startGame();
-    }
+    if(gameOver) showMenu();
 });
 
 document.addEventListener("keyup",(e)=>{
@@ -296,30 +282,64 @@ function update(){
     score++;
 }
 
-/* фон */
+/* 🌄 фони */
 function drawBg(){
     if(currentBg==="day"){
         ctx.fillStyle="#dff3ff";
         ctx.fillRect(0,0,800,200);
+
+        ctx.fillStyle="#ccc";
+        ctx.fillRect(100,50,60,20);
+        ctx.fillRect(200,30,80,25);
     }
+
     if(currentBg==="desert"){
         ctx.fillStyle="#f4d29c";
         ctx.fillRect(0,0,800,200);
+
+        ctx.fillStyle="#e0b878";
+        ctx.fillRect(0,160,800,40);
     }
+
     if(currentBg==="forest"){
         ctx.fillStyle="#87c77b";
         ctx.fillRect(0,0,800,200);
+
+        for(let i=0;i<800;i+=120){
+            ctx.fillStyle="#8b5a2b";
+            ctx.fillRect(i,120,10,60);
+
+            ctx.fillStyle="#2e8b57";
+            ctx.beginPath();
+            ctx.arc(i+5,110,25,0,Math.PI*2);
+            ctx.fill();
+        }
     }
 }
 
+/* 🦖 динозавр (норм вигляд) */
+function drawDino(){
+    ctx.fillStyle=currentSkin;
+
+    // тіло
+    ctx.fillRect(60, dino.y, 30, 20);
+
+    // голова
+    ctx.fillRect(80, dino.y-10, 15, 15);
+
+    // ноги
+    ctx.fillRect(60, dino.y+20, 8, 10);
+    ctx.fillRect(75, dino.y+20, 8, 10);
+}
+
+/* draw */
 function draw(){
     drawBg();
 
     ctx.fillStyle="#000";
     ctx.fillRect(0,180,800,2);
 
-    ctx.fillStyle=currentSkin;
-    ctx.fillRect(60, dino.duck?dino.y+15:dino.y,30,dino.duck?15:30);
+    drawDino();
 
     obstacles.forEach(o=>{
         ctx.fillRect(o.x,o.y,o.w,o.h);
@@ -330,6 +350,7 @@ function draw(){
     }
 }
 
+/* loop */
 function loop(){
     update();
     draw();

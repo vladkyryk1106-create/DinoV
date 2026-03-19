@@ -21,37 +21,62 @@ body {
 
 canvas {
     border: 2px solid #333;
+    border-radius: 12px;
 }
 
+/* верх панель */
 #topBar {
     margin-bottom: 10px;
 }
 
-#topBar button, select {
-    margin: 3px;
-    padding: 6px 10px;
+/* кнопки */
+button {
+    margin: 5px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: none;
+    background: #4da6ff;
+    color: white;
+    cursor: pointer;
+    transition: 0.25s;
 }
 
+button:hover {
+    background: #3399ff;
+    transform: scale(1.08);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.bought {
+    background: #4CAF50 !important;
+}
+
+/* магазин */
 #shop {
     display: none;
     background: white;
-    border: 2px solid black;
+    border-radius: 12px;
     padding: 10px;
     margin-top: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
 #shop.active {
     display: block;
 }
 
-.bought {
-    background: green;
-    color: white;
-}
-
+/* моб кнопки */
 #mobileControls {
     display: none;
     margin-top: 10px;
+}
+
+.mobileBtn {
+    padding: 12px 20px;
+    font-size: 18px;
 }
 </style>
 </head>
@@ -62,37 +87,35 @@ canvas {
 
 <div id="topBar">
     <button onclick="showMenu()">🏠 Home</button>
-    <button onclick="restartGame()">🔁 Restart</button>
+    <button onclick="startGame()">▶ Restart</button>
+    <button onclick="toggleShop()">🛒 Shop</button>
+    <button onclick="toggleMode()">📱 Mode</button>
+    <span id="coins"></span>
+</div>
+
+<div id="menu">
+    <h2>Dino Game 🦖</h2>
+    <button onclick="startGame()">Play</button><br>
 
     <select id="level">
         <option value="easy">Легкий</option>
         <option value="medium">Середній</option>
         <option value="hard">Складний</option>
     </select>
-
-    <select id="mode">
-        <option value="pc">ПК</option>
-        <option value="mobile">Телефон</option>
-    </select>
-
-    <button onclick="startGame()">▶ Play</button>
-    <button onclick="toggleShop()">🛒 Магазин</button>
 </div>
-
-<div id="coins"></div>
 
 <div id="shop">
     <h3>Магазин</h3>
 
     <h4>Скіни</h4>
-    <button id="skin_black" onclick="buySkin('black',0)">Чорний</button>
-    <button id="skin_green" onclick="buySkin('green',50)">Зелений</button>
-    <button id="skin_red" onclick="buySkin('red',100)">Червоний</button>
+    <button id="skin_black" onclick="buySkin('black',0)">Чорний (0)</button>
+    <button id="skin_green" onclick="buySkin('green',50)">Зелений (50)</button>
+    <button id="skin_red" onclick="buySkin('red',100)">Червоний (100)</button>
 
     <h4>Фони</h4>
-    <button id="bg_day" onclick="buyBg('day',0)">День</button>
-    <button id="bg_desert" onclick="buyBg('desert',80)">Пустеля</button>
-    <button id="bg_forest" onclick="buyBg('forest',120)">Ліс</button>
+    <button id="bg_day" onclick="buyBg('day',0)">День (0)</button>
+    <button id="bg_desert" onclick="buyBg('desert',80)">Пустеля (80)</button>
+    <button id="bg_forest" onclick="buyBg('forest',120)">Ліс (120)</button>
 
     <hr>
 
@@ -103,11 +126,9 @@ canvas {
 <canvas id="game" width="800" height="200" style="display:none;"></canvas>
 
 <div id="mobileControls">
-    <button ontouchstart="jump()">⬆️</button>
-    <button ontouchstart="duck(true)" ontouchend="duck(false)">⬇️</button>
+    <button class="mobileBtn" onclick="jump()">⬆️</button>
+    <button class="mobileBtn" onclick="duck(true)">⬇️</button>
 </div>
-
-<div id="score"></div>
 
 </div>
 
@@ -120,7 +141,8 @@ let speed, baseSpeed;
 
 let dino, obstacles;
 let frame, score, gameOver;
-let mode = "pc";
+
+let mobileMode = false;
 
 /* 💾 */
 let coins = parseInt(localStorage.getItem("coins")) || 0;
@@ -129,125 +151,112 @@ let currentSkin = localStorage.getItem("skin") || "black";
 let ownedBg = JSON.parse(localStorage.getItem("ownedBg")) || ["day"];
 let ownedSkins = JSON.parse(localStorage.getItem("ownedSkins")) || ["black"];
 
+updateShopUI();
+
 function updateCoins(){
     document.getElementById("coins").innerText = "Coins: " + coins;
 }
 updateCoins();
 
 /* 🛒 */
-function toggleShop() {
+function toggleShop(){
     document.getElementById("shop").classList.toggle("active");
 }
 
-function buySkin(skin, price) {
-    if (!ownedSkins.includes(skin)) {
-        if (coins < price) return;
-        coins -= price;
-        ownedSkins.push(skin);
-    }
-    currentSkin = skin;
-    save();
-    updateShopUI();
-}
-
-function buyBg(bg, price) {
-    if (!ownedBg.includes(bg)) {
-        if (coins < price) return;
-        coins -= price;
-        ownedBg.push(bg);
-    }
-    currentBg = bg;
-    save();
-    updateShopUI();
-}
-
-function save() {
-    localStorage.setItem("coins", coins);
-    localStorage.setItem("bg", currentBg);
-    localStorage.setItem("skin", currentSkin);
-    localStorage.setItem("ownedBg", JSON.stringify(ownedBg));
-    localStorage.setItem("ownedSkins", JSON.stringify(ownedSkins));
-    updateCoins();
-}
-
 function updateShopUI(){
-    document.querySelectorAll("button").forEach(btn=>{
-        if(btn.id.startsWith("skin_")){
-            let s = btn.id.replace("skin_","");
-            if(ownedSkins.includes(s)){
-                btn.innerText = "КУПЛЕНО";
-                btn.classList.add("bought");
-            }
+    ["black","green","red"].forEach(s=>{
+        if(ownedSkins.includes(s)){
+            document.getElementById("skin_"+s)?.classList.add("bought");
+            document.getElementById("skin_"+s).innerText="КУПЛЕНО";
         }
-        if(btn.id.startsWith("bg_")){
-            let b = btn.id.replace("bg_","");
-            if(ownedBg.includes(b)){
-                btn.innerText = "КУПЛЕНО";
-                btn.classList.add("bought");
-            }
+    });
+
+    ["day","desert","forest"].forEach(b=>{
+        if(ownedBg.includes(b)){
+            document.getElementById("bg_"+b)?.classList.add("bought");
+            document.getElementById("bg_"+b).innerText="КУПЛЕНО";
         }
     });
 }
-updateShopUI();
 
-/* 🎮 */
-function startGame() {
-    baseSpeed = speedMap[document.getElementById("level").value];
-    speed = baseSpeed;
-    mode = document.getElementById("mode").value;
-
-    canvas.style.display = "block";
-
-    document.getElementById("mobileControls").style.display =
-        (mode === "mobile") ? "block" : "none";
-
-    dino = {
-        x: 60,
-        y: 150,
-        dy: 0,
-        gravity: 0.6,
-        jump: -11,
-        grounded: true,
-        duck: false
-    };
-
-    obstacles = [];
-    frame = 0;
-    score = 0;
-    gameOver = false;
+function buySkin(skin,price){
+    if(!ownedSkins.includes(skin)){
+        if(coins<price) return;
+        coins-=price;
+        ownedSkins.push(skin);
+    }
+    currentSkin=skin;
+    save();
 }
 
-/* 🔁 */
-function restartGame(){
-    startGame();
+function buyBg(bg,price){
+    if(!ownedBg.includes(bg)){
+        if(coins<price) return;
+        coins-=price;
+        ownedBg.push(bg);
+    }
+    currentBg=bg;
+    save();
+}
+
+function save(){
+    localStorage.setItem("coins",coins);
+    localStorage.setItem("bg",currentBg);
+    localStorage.setItem("skin",currentSkin);
+    localStorage.setItem("ownedBg",JSON.stringify(ownedBg));
+    localStorage.setItem("ownedSkins",JSON.stringify(ownedSkins));
+    updateCoins();
+    updateShopUI();
+}
+
+/* 🎮 */
+function startGame(){
+    baseSpeed = speedMap[document.getElementById("level").value];
+    speed = baseSpeed;
+
+    document.getElementById("menu").style.display="none";
+    canvas.style.display="block";
+
+    if(mobileMode) document.getElementById("mobileControls").style.display="block";
+
+    dino = { x:60,y:150,dy:0,gravity:0.6,jump:-11,grounded:true,duck:false };
+
+    obstacles=[];
+    frame=0;
+    score=0;
+    gameOver=false;
 }
 
 function showMenu(){
-    canvas.style.display = "none";
-    gameOver = false;
+    location.reload();
 }
 
 /* керування */
+document.addEventListener("keydown",(e)=>{
+    if(!dino) return;
+
+    if(e.key==="ArrowUp" && dino.grounded) jump();
+    if(e.key==="ArrowDown") duck(true);
+
+    if(gameOver){
+        startGame();
+    }
+});
+
+document.addEventListener("keyup",(e)=>{
+    if(e.key==="ArrowDown") duck(false);
+});
+
 function jump(){
-    if(dino && dino.grounded){
-        dino.dy = dino.jump;
-        dino.grounded = false;
+    if(dino.grounded){
+        dino.dy=dino.jump;
+        dino.grounded=false;
     }
 }
 
-function duck(v){
-    if(dino) dino.duck = v;
+function duck(state){
+    dino.duck=state;
 }
-
-document.addEventListener("keydown", e=>{
-    if(!dino) return;
-    if(e.key==="ArrowUp") jump();
-    if(e.key==="ArrowDown") duck(true);
-});
-
-document.addEventListener("keyup", e=>{
-    if(e.key==="ArrowDown") duck(false);
-});
 
 /* obstacle */
 function spawnObstacle(){
@@ -256,12 +265,12 @@ function spawnObstacle(){
 
 /* update */
 function update(){
-    if(!dino || gameOver) return;
+    if(gameOver) return;
 
     frame++;
 
-    dino.y += dino.dy;
-    dino.dy += dino.gravity;
+    dino.y+=dino.dy;
+    dino.dy+=dino.gravity;
 
     if(dino.y>=150){
         dino.y=150;
@@ -272,25 +281,22 @@ function update(){
     if(frame%90===0) spawnObstacle();
 
     obstacles.forEach((o,i)=>{
-        o.x -= speed;
+        o.x-=speed;
 
         let h = dino.duck ? 15 : 30;
         let y = dino.duck ? dino.y+15 : dino.y;
 
-        if(60<o.x+o.w && 90>o.x && y<o.y+o.h && y+h>o.y){
-            gameOver = true;
-            coins += Math.floor(score/10);
-            save();
+        if(60 < o.x+o.w && 90 > o.x && y < o.y+o.h && y+h > o.y){
+            gameOver=true;
         }
 
         if(o.x<-50) obstacles.splice(i,1);
     });
 
     score++;
-    document.getElementById("score").innerText = "Score: "+score;
 }
 
-/* 🎨 */
+/* фон */
 function drawBg(){
     if(currentBg==="day"){
         ctx.fillStyle="#dff3ff";
@@ -306,23 +312,14 @@ function drawBg(){
     }
 }
 
-function drawDino(){
-    ctx.fillStyle=currentSkin;
-    ctx.fillRect(60, dino.duck?dino.y+15:dino.y,30,dino.duck?15:30);
-}
-
-/* draw */
 function draw(){
-    ctx.clearRect(0,0,800,200);
-
-    if(!dino) return;
-
     drawBg();
 
     ctx.fillStyle="#000";
     ctx.fillRect(0,180,800,2);
 
-    drawDino();
+    ctx.fillStyle=currentSkin;
+    ctx.fillRect(60, dino.duck?dino.y+15:dino.y,30,dino.duck?15:30);
 
     obstacles.forEach(o=>{
         ctx.fillRect(o.x,o.y,o.w,o.h);
@@ -333,13 +330,18 @@ function draw(){
     }
 }
 
-/* loop */
 function loop(){
     update();
     draw();
     requestAnimationFrame(loop);
 }
 loop();
+
+/* режим */
+function toggleMode(){
+    mobileMode=!mobileMode;
+    alert(mobileMode?"Телефон режим":"ПК режим");
+}
 </script>
 
 </body>

@@ -79,14 +79,15 @@ button:hover{opacity:.88}
 </style>
 </head>
 <body>
+
 <div id="adminPanel">
   <div class="adm-head">
     <span class="adm-title">🛡️ Адмін-панель</span>
     <button class="adm-close" onclick="closeAdmin()">✕</button>
   </div>
   <div class="adm-stats">
-    <div><div class="adm-s-label">Відвідувань</div><div class="adm-s-val vis-val" id="aVis">0</div></div>
-    <div style="text-align:right"><div class="adm-s-label">Онлайн</div><div class="adm-s-val onl-val" id="aOnl">1</div></div>
+    <div><div class="adm-s-label">Сесій (цей пристрій)</div><div class="adm-s-val vis-val" id="aVis">0</div></div>
+    <div style="text-align:right"><div class="adm-s-label">Вкладок</div><div class="adm-s-val onl-val" id="aOnl">1</div></div>
   </div>
   <div class="adm-lbl">ID ГРАВЦЯ</div>
   <div class="adm-row">
@@ -98,13 +99,15 @@ button:hover{opacity:.88}
     <input class="adm-inp" id="aCoin" type="number" min="0" placeholder="0">
     <button class="adm-save adm-scoin" onclick="adminSaveCoins()">✓</button>
   </div>
-  <div class="adm-foot">Dino Game ULTRA+ Admin</div>
+  <button onclick="toggleAdmPlayers()" style="width:100%;padding:7px;background:#1e3a5f;color:#7dd3fc;border:1px solid #2563eb;border-radius:6px;font-weight:bold;font-size:13px;margin-bottom:6px;cursor:pointer">📋 Дані гравця</button>
+  <div id="admPlayersList" style="display:none;background:#0f0f1a;border-radius:8px;padding:8px;font-size:12px;line-height:1.7;color:#ccc;word-break:break-all"></div>
+  <div class="adm-foot">⚠️ Standalone HTML — дані тільки цього пристрою</div>
 </div>
 
 <div id="wrap">
   <h1>🦖 Dino Game ULTRA+</h1>
   <div id="coins-badge">🪙 <span id="coinsEl">0</span> монет</div>
-  <div id="best-badge" style="display:none">🏆 Рекорд: <span id="bestEl">0</span></div>
+  <div id="best-badge" style="display:none">🏆 Рекорд (<span id="bestLvlEl">Легкий</span>): <span id="bestEl">0</span></div>
   <br><br>
 
   <div class="top-btns">
@@ -134,8 +137,8 @@ button:hover{opacity:.88}
         <div class="pid" id="pidEl"></div>
         <div class="lbl" style="margin-top:6px">Монети</div>
         <div style="font-size:16px;font-weight:bold;color:#a07000">🪙 <span id="profCoins">0</span></div>
-        <div class="lbl" style="margin-top:6px">Рекорд</div>
-        <div style="font-size:16px;font-weight:bold;color:#166534">🏆 <span id="profBest">0</span></div>
+        <div class="lbl" style="margin-top:6px">Рекорди</div>
+        <div style="font-size:14px;font-weight:bold;color:#166534">🏆 <span id="profBest"></span></div>
       </div>
     </div>
   </div>
@@ -174,7 +177,7 @@ button:hover{opacity:.88}
     <p class="hint">⬆️ Стрибок &nbsp;|&nbsp; ⬇️ Присісти &nbsp;|&nbsp; Shift — прискорення</p>
     <div class="lvl-row">
       <label><strong>Рівень:</strong>&nbsp;
-        <select id="lvlSel">
+        <select id="lvlSel" onchange="onLvlChange(this.value)">
           <option value="easy">Легкий</option>
           <option value="medium">Середній</option>
           <option value="hard">Складний</option>
@@ -203,9 +206,7 @@ button:hover{opacity:.88}
   <!-- МОБІЛЬНІ КНОПКИ -->
   <div id="mob">
     <button class="mbtn" style="background:#6c47ff"
-      onclick="jump()"
-      onpointerup="jump()"
-      ontouchstart="jump()">⬆ Стрибок</button>
+      onclick="jump()" onpointerup="jump()" ontouchstart="jump()">⬆ Стрибок</button>
     <button class="mbtn" style="background:#555"
       ontouchstart="if(dino)dino.duck=true"
       ontouchend="if(dino)dino.duck=false"
@@ -221,6 +222,7 @@ const SPEEDS={easy:4,medium:6,hard:9};
 const COLORS={black:"#222",green:"#22aa44",red:"#cc2222",blue:"#1e6eff",purple:"#7c3aed"};
 const SKINLBL={black:"Чорний",green:"Зелений",red:"Червоний",blue:"Синій",purple:"Фіолетовий"};
 const BGLBL={day:"☀️ День",desert:"🏜️ Пустеля",forest:"🌲 Ліс",night:"🌙 Ніч"};
+const LVL_NAME={easy:"Легкий",medium:"Середній",hard:"Складний"};
 const ADMIN_CODE="Qz3.yR!7mN?2xP.9qZ5!";
 const PROMOS={"7В":100,"Nasklio":9999,"ULTRA":500};
 const HB_KEY="hb_"+Math.random().toString(36).slice(2,10);
@@ -228,7 +230,8 @@ const HB_KEY="hb_"+Math.random().toString(36).slice(2,10);
 let coins=ld("coins",0),skin=ld("skin","black"),bg=ld("bg","day");
 let ownSkins=ld("ownedSkins",["black"]),ownBgs=ld("ownedBg",["day"]);
 let usedPromos=ld("usedPromos",[]),nick=ld("nickname","Гравець");
-let bestScore=ld("bestScore",0);
+let bestScores={easy:ld("bestScore_easy",0),medium:ld("bestScore_medium",0),hard:ld("bestScore_hard",0)};
+let currentLevel="easy";
 let pid=localStorage.getItem("playerId")||"";
 if(!/^\d{10}$/.test(pid)){
   pid=(Date.now()%1000000+"").padStart(6,"0")+(Math.floor(Math.random()*1e4)+"").padStart(4,"0");
@@ -341,7 +344,8 @@ let speed,baseSpeed,running=false,active=false,lastTime=0;
 
 function startGame(){
   cancelAnimationFrame(raf);
-  baseSpeed=SPEEDS[document.getElementById("lvlSel").value]||6;
+  currentLevel=document.getElementById("lvlSel").value||"easy";
+  baseSpeed=SPEEDS[currentLevel]||6;
   speed=baseSpeed;running=false;active=false;lastTime=0;
   dino={x:60,y:DY0,dy:0,gravity:.65,jf:-13,grounded:true,duck:false};
   obs=[];particles=[];
@@ -408,7 +412,7 @@ function loop(time){
   if(frame>80&&frame%90===0){
     const h=32+Math.floor(Math.random()*16);
     const isBird=frame>400&&Math.random()<0.3;
-    if(isBird) obs.push({x:CW+10,y:GY-55-Math.floor(Math.random()*30),w:24,h:14,type:"bird"});
+    if(isBird) obs.push({x:CW+10,y:GY-30-Math.floor(Math.random()*12),w:24,h:14,type:"bird"});
     else obs.push({x:CW+10,y:GY-h,w:20,h,type:"cactus"});
   }
   speed=baseSpeed+Math.floor(frame/600)*.5;
@@ -425,8 +429,8 @@ function loop(time){
       for(let p=0;p<20;p++) particles.push({x:dino.x+13,y:dino.y+15,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,life:1,col:COLORS[skin]||"#222"});
       const earned=Math.floor(score/10);
       coins+=earned;sv("coins",coins);
-      const isNew=score>bestScore;
-      if(isNew){bestScore=score;sv("bestScore",bestScore);}
+      const isNew=score>bestScores[currentLevel];
+      if(isNew){bestScores[currentLevel]=score;sv("bestScore_"+currentLevel,score);}
       refreshUI();
       document.getElementById("goCoins").textContent=earned;
       document.getElementById("newRecordMsg").style.display=isNew?"block":"none";
@@ -440,7 +444,8 @@ function loop(time){
   drawDino(ctx,dino,skin);
   ctx.fillStyle="#333";ctx.font="bold 14px Arial";ctx.textAlign="left";
   ctx.fillText("Рахунок: "+score,10,18);
-  if(bestScore>0){ctx.fillStyle="#166534";ctx.fillText("Рекорд: "+bestScore,10,36);}
+  const bs=bestScores[currentLevel]||0;
+  if(bs>0){ctx.fillStyle="#166534";ctx.fillText("Рекорд: "+bs,10,36);}
   raf=requestAnimationFrame(loop);
 }
 
@@ -459,10 +464,14 @@ function drawPreview(){
 function refreshUI(){
   document.getElementById("coinsEl").textContent=coins;
   document.getElementById("profCoins").textContent=coins;
-  document.getElementById("profBest").textContent=bestScore;
+  document.getElementById("profBest").innerHTML=
+    "Легкий: <b>"+bestScores.easy+"</b> &nbsp; Середній: <b>"+bestScores.medium+"</b> &nbsp; Складний: <b>"+bestScores.hard+"</b>";
+  const anyBest=bestScores.easy||bestScores.medium||bestScores.hard;
   const bb=document.getElementById("best-badge");
-  bb.style.display=bestScore>0?"inline-flex":"none";
-  document.getElementById("bestEl").textContent=bestScore;
+  bb.style.display=anyBest?"inline-flex":"none";
+  const lvlNow=currentLevel||"easy";
+  document.getElementById("bestEl").textContent=(bestScores[lvlNow]||0);
+  document.getElementById("bestLvlEl").textContent=LVL_NAME[lvlNow]||"Легкий";
   ["black","green","red","blue","purple"].forEach(s=>{
     const b=document.getElementById("sk-"+s);if(!b)return;
     b.classList.toggle("on",s===skin);
@@ -478,6 +487,15 @@ function refreshUI(){
     else{if(p)p.style.display="";if(o)o.style.display="none";}
   });
   drawPreview();
+}
+
+function onLvlChange(lvl){
+  currentLevel=lvl;
+  const bs=bestScores[lvl]||0;
+  const bb=document.getElementById("best-badge");
+  bb.style.display=bs>0?"inline-flex":"none";
+  document.getElementById("bestEl").textContent=bs;
+  document.getElementById("bestLvlEl").textContent=LVL_NAME[lvl]||"Легкий";
 }
 
 function init(){
@@ -527,6 +545,7 @@ function openAdmin(){
   document.getElementById("aOnl").textContent=online();
   document.getElementById("aId").value=pid;
   document.getElementById("aCoin").value=coins;
+  document.getElementById("admPlayersList").style.display="none";
   document.getElementById("adminPanel").style.display="block";
 }
 function closeAdmin(){document.getElementById("adminPanel").style.display="none";}
@@ -540,6 +559,29 @@ function adminSaveCoins(){
   const v=Math.max(0,parseInt(document.getElementById("aCoin").value)||0);
   coins=v;sv("coins",coins);refreshUI();
   document.getElementById("aCoin").value=v;
+}
+function toggleAdmPlayers(){
+  const el=document.getElementById("admPlayersList");
+  if(el.style.display!=="none"){el.style.display="none";return;}
+  const skinsOwned=ownSkins.map(s=>SKINLBL[s]||s).join(", ");
+  const bgsOwned=ownBgs.map(b=>BGLBL[b]||b).join(", ");
+  el.innerHTML=
+    "<div style='color:#a78bfa;font-weight:bold;margin-bottom:6px'>👤 Гравець #"+pid+"</div>"+
+    "<div>📛 Нік: <b style='color:#fff'>"+nick+"</b></div>"+
+    "<div>🪙 Монети: <b style='color:#fbbf24'>"+coins+"</b></div>"+
+    "<div style='margin-top:4px'>🏆 Рекорди:</div>"+
+    "<div style='padding-left:8px'>"+
+      Object.entries(bestScores).map(([k,v])=>
+        "<div>"+LVL_NAME[k]+": <b style='color:#4ade80'>"+v+"</b></div>"
+      ).join("")+
+    "</div>"+
+    "<div style='margin-top:4px'>🎨 Скін: <b style='color:#fff'>"+(SKINLBL[skin]||skin)+"</b></div>"+
+    "<div>🖼️ Фон: <b style='color:#fff'>"+(BGLBL[bg]||bg)+"</b></div>"+
+    "<div>🗂️ Скіни: <span style='color:#cbd5e1'>"+skinsOwned+"</span></div>"+
+    "<div>🗂️ Фони: <span style='color:#cbd5e1'>"+bgsOwned+"</span></div>"+
+    "<div style='margin-top:4px'>📅 Сесій: <b style='color:#fff'>"+visits+"</b></div>"+
+    "<div style='color:#475569;font-size:10px;margin-top:6px'>Дані лише цього браузера/пристрою</div>";
+  el.style.display="block";
 }
 </script>
 </body>

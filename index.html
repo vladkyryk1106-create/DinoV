@@ -6,8 +6,12 @@
 <style>
 * { box-sizing: border-box; }
 body {
-  margin: 0; display: flex; justify-content: center; align-items: center;
-  min-height: 100vh; background: linear-gradient(#dff3ff, #ffffff);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(#dff3ff, #ffffff);
   font-family: Arial, sans-serif;
 }
 #gameContainer { text-align: center; max-width: 860px; width: 100%; padding: 16px; }
@@ -21,7 +25,7 @@ h1 { margin: 0 0 12px; font-size: 26px; color: #222; }
 .btn-profile { padding:8px 18px; background:#2563eb; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; }
 .btn-shop-main { padding:8px 18px; background:#6c47ff; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; }
 .panel-wrap { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.35s ease, opacity 0.3s ease; }
-.panel-wrap.open { max-height: 700px; opacity: 1; }
+.panel-wrap.open { max-height: 800px; opacity: 1; }
 #profile {
   background:#fff; border:2px solid #ddd; border-radius:12px;
   padding:16px; margin-bottom:12px;
@@ -30,7 +34,7 @@ h1 { margin: 0 0 12px; font-size: 26px; color: #222; }
 #previewCanvas { border:2px solid #ccc; border-radius:8px; display:block; }
 .profile-data { flex:1; min-width:180px; }
 .label-small { font-size:12px; color:#888; margin-bottom:2px; }
-.nick-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+.nick-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
 .nick-text { font-size:20px; font-weight:bold; color:#222; }
 .btn-edit { padding:3px 10px; background:#f0ebff; border:1.5px solid #6c47ff; border-radius:6px; cursor:pointer; font-size:13px; color:#6c47ff; font-weight:bold; }
 .nick-input { padding:5px 10px; border:1.5px solid #6c47ff; border-radius:6px; font-size:16px; width:140px; }
@@ -41,14 +45,6 @@ h1 { margin: 0 0 12px; font-size: 26px; color: #222; }
   color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe;
   border-radius:6px; padding:4px 10px; display:inline-block; margin-bottom:10px;
 }
-.role-badge {
-  display:inline-block; padding:2px 10px; border-radius:20px;
-  font-size:12px; font-weight:bold; margin-left:6px; vertical-align:middle;
-}
-.role-admin    { background:#fde8ff; color:#9c27b0; border:1px solid #d580ff; }
-.role-tester   { background:#e0f0ff; color:#1565c0; border:1px solid #90caf9; }
-.role-moder    { background:#e8f5e9; color:#2e7d32; border:1px solid #81c784; }
-.role-vip      { background:#fff8e1; color:#f57f17; border:1px solid #ffd54f; }
 #shop { background:#fff; border:2px solid #ddd; border-radius:10px; padding:16px; margin-bottom:12px; text-align:left; }
 #shop h3 { margin:0 0 10px; }
 #shop h4 { margin:8px 0 6px; font-size:14px; color:#555; }
@@ -83,15 +79,12 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
 .btn-mobile { padding:14px 32px; color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:18px; user-select:none; -webkit-user-select:none; }
 .btn-jump { background:#6c47ff; }
 .btn-duck { background:#555; }
-
-/* ── Адмін панель ── */
 #adminPanel {
   display:none; position:fixed; top:12px; right:12px; z-index:9999;
   background:#1a1a2e; color:#eee; border-radius:12px;
-  padding:16px; width:310px;
-  box-shadow:0 4px 28px rgba(0,0,0,0.6);
+  padding:16px; width:240px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.55);
   border:2px solid #6c47ff; font-size:13px;
-  max-height:calc(100vh - 24px); overflow-y:auto;
 }
 #adminPanel.open { display:block; }
 .admin-title { font-size:15px; font-weight:bold; color:#a78bfa; }
@@ -102,43 +95,17 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
 .stat-visits .stat-val { color:#22d3ee; }
 .stat-online .stat-val { color:#4ade80; }
 .stat-online { text-align:right; }
-.admin-field-label { color:#888; font-size:11px; margin-bottom:4px; text-transform:uppercase; }
+.admin-field-label { color:#888; font-size:11px; margin-bottom:4px; }
 .admin-row { display:flex; gap:4px; margin-bottom:8px; }
-.admin-input {
-  flex:1; padding:5px 8px;
-  background:#0f0f1a; border:1px solid #444; border-radius:6px;
-  color:#eee; font-family:monospace; font-size:13px;
-}
+.admin-input { flex:1; padding:5px 8px; background:#0f0f1a; border:1px solid #444; border-radius:6px; color:#eee; font-family:monospace; font-size:13px; }
 .admin-save { padding:5px 10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; }
 .admin-save-id { background:#6c47ff; color:#fff; }
 .admin-save-coins { background:#22aa44; color:#fff; }
-.admin-divider { border:none; border-top:1px solid #2a2a3e; margin:10px 0; }
-.admin-section-title {
-  color:#a78bfa; font-size:12px; font-weight:bold; text-transform:uppercase;
-  display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
-}
-.players-list {
-  max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:5px;
-}
-.players-list::-webkit-scrollbar { width:4px; }
-.players-list::-webkit-scrollbar-track { background:#0f0f1a; border-radius:2px; }
-.players-list::-webkit-scrollbar-thumb { background:#444; border-radius:2px; }
-.player-row {
-  background:#0f0f1a; border-radius:7px; padding:7px 8px;
-}
-.player-nick { font-weight:bold; color:#eee; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:150px; }
-.player-pid { font-family:monospace; color:#888; font-size:11px; margin-bottom:4px; display:block; }
-.role-select {
-  width:100%; background:#1a1a2e; border:1px solid #444; color:#eee; border-radius:5px;
-  padding:3px 5px; font-size:11px; cursor:pointer;
-}
-.no-players { color:#555; font-size:12px; text-align:center; padding:12px 0; }
-.admin-footer { color:#555; font-size:10px; text-align:center; margin-top:10px; }
+.admin-footer { color:#555; font-size:10px; text-align:center; margin-top:8px; }
 </style>
 </head>
 <body>
 
-<!-- Адмін панель -->
 <div id="adminPanel">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
     <span class="admin-title">🛡️ Адмін-панель</span>
@@ -164,24 +131,19 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
     <input class="admin-input" id="adminCoinsInput" type="number" min="0" placeholder="0">
     <button class="admin-save admin-save-coins" onclick="adminSaveCoins()">✓</button>
   </div>
-  <hr class="admin-divider">
-  <div class="admin-section-title">
-    <span>👥 Гравці</span>
-    <span id="adminPlayerCount" style="color:#888;font-weight:normal"></span>
-  </div>
-  <div class="players-list" id="adminPlayersList"></div>
   <div class="admin-footer">Dino Game ULTRA+ Admin</div>
 </div>
 
 <div id="gameContainer">
+
   <h1>🦖 Dino Game ULTRA+</h1>
   <div id="coinDisplay">🪙 <span id="coinCount">0</span> монет</div><br>
+
   <div class="top-btns">
     <button class="btn-profile" onclick="toggleProfile()">👤 Профіль</button>
     <button class="btn-shop-main" onclick="toggleShop()">🛒 Магазин</button>
   </div>
 
-  <!-- Профіль -->
   <div class="panel-wrap" id="profileWrap">
     <div id="profile">
       <div>
@@ -192,7 +154,6 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
         <div class="label-small">Нік гравця</div>
         <div class="nick-row" id="nickDisplay">
           <span class="nick-text" id="nickText"></span>
-          <span id="roleBadgeEl"></span>
           <button class="btn-edit" onclick="startEditNick()">✏️ Змінити</button>
         </div>
         <div class="nick-row" id="nickEdit" style="display:none">
@@ -208,15 +169,20 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
     </div>
   </div>
 
-  <!-- Магазин -->
   <div class="panel-wrap" id="shopWrap">
     <div id="shop">
       <h3>Магазин</h3>
       <h4>Скіни діно:</h4>
       <div class="btn-row">
-        <button class="skin-btn" id="skin-black" onclick="buySkin('black',0)"><span class="skin-dot" style="background:#222"></span> Чорний</button>
-        <button class="skin-btn" id="skin-green" onclick="buySkin('green',50)"><span class="skin-dot" style="background:#22aa44"></span> Зелений <span class="price-tag">(50🪙)</span></button>
-        <button class="skin-btn" id="skin-red" onclick="buySkin('red',100)"><span class="skin-dot" style="background:#cc2222"></span> Червоний <span class="price-tag">(100🪙)</span></button>
+        <button class="skin-btn" id="skin-black" onclick="buySkin('black',0)">
+          <span class="skin-dot" style="background:#222"></span> Чорний
+        </button>
+        <button class="skin-btn" id="skin-green" onclick="buySkin('green',50)">
+          <span class="skin-dot" style="background:#22aa44"></span> Зелений <span class="price-tag">(50🪙)</span>
+        </button>
+        <button class="skin-btn" id="skin-red" onclick="buySkin('red',100)">
+          <span class="skin-dot" style="background:#cc2222"></span> Червоний <span class="price-tag">(100🪙)</span>
+        </button>
       </div>
       <h4>Фони:</h4>
       <div class="btn-row">
@@ -234,7 +200,6 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
     </div>
   </div>
 
-  <!-- Меню -->
   <div class="card" id="menuCard">
     <p class="hint">⬆️ Стрибок &nbsp;|&nbsp; ⬇️ Присісти &nbsp;|&nbsp; Shift — прискорення</p>
     <div class="level-wrap">
@@ -249,7 +214,6 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
     </div>
   </div>
 
-  <!-- Game Over -->
   <div class="card" id="gameOverCard" style="display:none">
     <h2 class="go-title">💀 Гру закінчено!</h2>
     <p>Рахунок: <strong id="finalScore">0</strong></p>
@@ -262,6 +226,7 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
 
   <canvas id="game" width="800" height="200"></canvas>
   <div id="scoreBar">Рахунок: <span id="scoreLive">0</span></div>
+
   <div id="mobileControls">
     <button class="btn-mobile btn-jump" onpointerdown="jump()">⬆ Стрибок</button>
     <button class="btn-mobile btn-duck"
@@ -270,260 +235,532 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
       onpointerleave="dino&&(dino.duck=false)"
     >⬇ Присісти</button>
   </div>
+
 </div>
 
 <script>
-const CANVAS_W=800,CANVAS_H=200,GROUND_Y=150;
-const SPEED_MAP={easy:4,medium:6,hard:9};
-const SKIN_COLORS={black:"#222",green:"#22aa44",red:"#cc2222"};
-const SKIN_LABELS={black:"Чорний",green:"Зелений",red:"Червоний"};
-const BG_LABELS={day:"☀️ День",desert:"🏜️ Пустеля",forest:"🌲 Ліс"};
-const ADMIN_CODE="Qz3.yR!7mN?2xP.9qZ5!";
-const SESSION_KEY="hb_"+Math.random().toString(36).slice(2,10);
-const ROLE_META={
-  "":     {label:"",cls:""},
-  admin:  {label:"👑 Адмін",  cls:"role-admin"},
-  tester: {label:"🧪 Тестер", cls:"role-tester"},
-  moder:  {label:"🛡 Модер",  cls:"role-moder"},
-  vip:    {label:"⭐ VIP",    cls:"role-vip"},
-};
+// ─── Константи ───────────────────────────────────────────────────────────────
+const CANVAS_W = 800, CANVAS_H = 200;
+// GROUND_Y — поверхня землі. Дино стоїть ВИЩЕ неї.
+// Дино висота стоячи = 30px, тому y_old = GROUND_Y, y_new = GROUND_Y - 30
+const GROUND_Y = 170;       // де знаходиться поверхня землі
+const DINO_H = 30;          // висота дино стоячи
+const DINO_W = 26;          // ширина дино
+const DINO_START_Y = GROUND_Y - DINO_H; // 140 — верх тіла коли стоїть
 
-function load(k,d){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch{return d;}}
-function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
+const SPEED_MAP = { easy:4, medium:6, hard:9 };
+const SKIN_COLORS = { black:"#222", green:"#22aa44", red:"#cc2222" };
+const SKIN_LABELS = { black:"Чорний", green:"Зелений", red:"Червоний" };
+const BG_LABELS = { day:"☀️ День", desert:"🏜️ Пустеля", forest:"🌲 Ліс" };
+const ADMIN_CODE = "Qz3.yR!7mN?2xP.9qZ5!";
+const SESSION_KEY = "hb_" + Math.random().toString(36).slice(2,10);
 
-function genId(){
-  return Date.now().toString().slice(-6)+Math.floor(Math.random()*10000).toString().padStart(4,"0");
+// ─── localStorage утиліти ────────────────────────────────────────────────────
+function load(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; }
+  catch { return def; }
+}
+function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+function genId() {
+  const ts = Date.now().toString().slice(-6);
+  const rnd = Math.floor(Math.random() * 10000).toString().padStart(4,"0");
+  return ts + rnd;
 }
 
-let coins=load("coins",0),currentBg=load("bg","day"),currentSkin=load("skin","black");
-let ownedBgs=load("ownedBg",["day"]),ownedSkins=load("ownedSkins",["black"]),usedPromos=load("usedPromos",[]);
-let nickname=load("nickname","Гравець");
-let playerId=localStorage.getItem("playerId");
-if(!playerId||!/^\d+$/.test(playerId)){playerId=genId();localStorage.setItem("playerId",playerId);}
-
-/* ── Реєстр гравців ── */
-function registerPlayer(){
-  const reg=load("playerRegistry",[]);
-  const entry={id:playerId,nick:nickname,lastSeen:Date.now()};
-  const idx=reg.findIndex(p=>p.id===playerId);
-  if(idx>=0)reg[idx]=entry;else reg.push(entry);
-  save("playerRegistry",reg);
+// ─── Стан гравця ─────────────────────────────────────────────────────────────
+let coins        = load("coins", 0);
+let currentBg    = load("bg", "day");
+let currentSkin  = load("skin", "black");
+let ownedBgs     = load("ownedBg", ["day"]);
+let ownedSkins   = load("ownedSkins", ["black"]);
+let usedPromos   = load("usedPromos", []);
+let nickname     = load("nickname", "Гравець");
+let playerId     = localStorage.getItem("playerId");
+if (!playerId || !/^\d+$/.test(playerId)) {
+  playerId = genId();
+  localStorage.setItem("playerId", playerId);
 }
-registerPlayer();
 
-function getMyRole(){return(load("playerRoles",{}))[playerId]||"";}
+// ─── Відвідування та онлайн ──────────────────────────────────────────────────
+const totalVisits = (parseInt(localStorage.getItem("totalVisits") || "0")) + 1;
+localStorage.setItem("totalVisits", String(totalVisits));
 
-/* ── Відвідування ── */
-const totalVisits=(parseInt(localStorage.getItem("totalVisits")||"0"))+1;
-localStorage.setItem("totalVisits",String(totalVisits));
-
-/* ── Онлайн ── */
-function updateHeartbeat(){localStorage.setItem(SESSION_KEY,String(Date.now()));}
-function countOnline(){
-  const now=Date.now();let c=0;
-  for(let i=0;i<localStorage(now-parseInt(localStorage.getItem(k)||"0")<15000)c++;}
+function updateHeartbeat() { localStorage.setItem(SESSION_KEY, String(Date.now())); }
+function countOnline() {
+  const now = Date.now(); let c = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith("hb_")) {
+      const t = parseInt(localStorage.getItem(k) || "0");
+      if (now - t < 15000) c++;
+    }
   }
-  return Math.max(1,c);
+  return Math.max(1, c);
 }
 updateHeartbeat();
-setInterval(()=>{updateHeartbeat();document.getElementById("adminOnline").textContent=countOnline();},5000);
-window.addEventListener("beforeunload",()=>localStorage.removeItem(SESSION_KEY));
+setInterval(() => {
+  updateHeartbeat();
+  document.getElementById("adminOnline").textContent = countOnline();
+}, 5000);
+window.addEventListener("beforeunload", () => localStorage.removeItem(SESSION_KEY));
 
-/* ── Бейдж ролі ── */
-function renderRoleBadge(){
-  const role=getMyRole(),el=document.getElementById("roleBadgeEl");
-  if(!role){el.innerHTML="";return;}
-  const m=ROLE_META[role];
-  el.innerHTML=`<span class="role-badge ${m.cls}">${m.label}</span>`;
-}
-
-/* ── Адмін: список гравців ── */
-function formatTimeAgo(ts){
-  const d=Math.floor((Date.now()-ts)/1000);
-  if(d<60)return"щойно";if(d<3600)return Math.floor(d/60)+"хв тому";
-  if(d<86400)return Math.floor(d/3600)+"год тому";return Math.floor(d/86400)+"дн тому";
-}
-function escHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-
-function renderPlayersList(){
-  const list=document.getElementById("adminPlayersList");
-  const reg=[...load("playerRegistry",[])].sort((a,b)=>b.lastSeen-a.lastSeen);
-  const roles=load("playerRoles",{});
-  document.getElementById("adminPlayerCount").textContent=reg.length+" гравців";
-  if(!reg.length){list.innerHTML='<div class="no-players">Поки немає гравців</div>';return;}
-  list.innerHTML=reg.map(p=>{
-    const role=roles[p.id]||"";
-    const opts=Object.keys(ROLE_META).map(r=>`<option value="${r}"${role===r?" selected":""}>${r===""?"— без ролі —":ROLE_META[r].label}</option>`).join("");
-    return`<div class="player-row">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span class="player-nick">${escHtml(p.nick)}</span>
-        <span style="color:#555;font-size:10px">${formatTimeAgo(p.lastSeen)}</span>
-      </div>
-      <span class="player-pid">#${p.id}</span>
-      <select class="role-select" onchange="setPlayerRole('${p.id}',this.value)">${opts}</select>
-    </div>`;
-  }).join("");
-}
-
-function setPlayerRole(pid,role){
-  const roles=load("playerRoles",{});
-  if(role==="")delete roles[pid];else roles[pid]=role;
-  save("playerRoles",roles);
-  renderRoleBadge();
-}
-
-function openAdmin(){
-  document.getElementById("adminVisits").textContent=totalVisits;
-  document.getElementById("adminOnline").textContent=countOnline();
-  document.getElementById("adminIdInput").value=playerId;
-  document.getElementById("adminCoinsInput").value=coins;
-  renderPlayersList();
+// ─── Адмін панель ────────────────────────────────────────────────────────────
+function openAdmin() {
+  document.getElementById("adminVisits").textContent = totalVisits;
+  document.getElementById("adminOnline").textContent = countOnline();
+  document.getElementById("adminIdInput").value = playerId;
+  document.getElementById("adminCoinsInput").value = coins;
   document.getElementById("adminPanel").classList.add("open");
 }
-function adminSaveId(){
-  const val=document.getElementById("adminIdInput").value.replace(/\D/g,"").slice(0,10);
-  if(!val)return;
-  const p=val.padStart(10,"0");
-  localStorage.setItem("playerId",p);playerId=p;
-  document.getElementById("playerIdEl").textContent="#"+p;
-  document.getElementById("adminIdInput").value=p;
-  registerPlayer();
+function adminSaveId() {
+  const val = document.getElementById("adminIdInput").value.replace(/\D/g,"").slice(0,10);
+  if (!val) return;
+  const padded = val.padStart(10,"0");
+  localStorage.setItem("playerId", padded);
+  playerId = padded;
+  document.getElementById("playerIdEl").textContent = "#" + padded;
+  document.getElementById("adminIdInput").value = padded;
 }
-function adminSaveCoins(){
-  const val=Math.max(0,parseInt(document.getElementById("adminCoinsInput").value)||0);
-  coins=val;save("coins",coins);refreshUI();
-  document.getElementById("adminCoinsInput").value=val;
-}
-
-/* ── Canvas ── */
-let dino,obstacles,frame,score,gameOver,rafId,speed,baseSpeed,running=false;
-const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
-canvas.style.display="none";canvas.onclick=()=>jump();
-
-const pcanvas=document.getElementById("previewCanvas"),pctx=pcanvas.getContext("2d");
-function drawPreview(){
-  const W=200,H=100,gy=68;
-  if(currentBg==="day"){pctx.fillStyle="#dff3ff";pctx.fillRect(0,0,W,H);}
-  else if(currentBg==="desert"){pctx.fillStyle="#f4d29c";pctx.fillRect(0,0,W,H);pctx.fillStyle="#e0b878";pctx.fillRect(0,gy+12,W,H-gy-12);}
-  else{pctx.fillStyle="#87c77b";pctx.fillRect(0,0,W,H);for(let i=0;i<W;i+=50){pctx.fillStyle="#8b5a2b";pctx.fillRect(i,52,5,28);pctx.fillStyle="#2e8b57";pctx.beginPath();pctx.arc(i+2,47,12,0,Math.PI*2);pctx.fill();}}
-  pctx.fillStyle="#333";pctx.fillRect(0,gy+12,W,2);
-  const dx=30,dy=gy-15;
-  pctx.fillStyle=SKIN_COLORS[currentSkin];pctx.fillRect(dx,dy,16,15);
-  pctx.fillStyle="#fff";pctx.fillRect(dx+12,dy+2,3,3);pctx.fillStyle="#000";pctx.fillRect(dx+13,dy+3,2,2);
-  pctx.fillStyle=SKIN_COLORS[currentSkin];pctx.fillRect(dx+2,dy+15,4,5);pctx.fillRect(dx+8,dy+15,4,5);
-  document.getElementById("previewLabel").textContent=SKIN_LABELS[currentSkin]+" · "+BG_LABELS[currentBg];
+function adminSaveCoins() {
+  const val = Math.max(0, parseInt(document.getElementById("adminCoinsInput").value) || 0);
+  coins = val; save("coins", coins); refreshUI();
+  document.getElementById("adminCoinsInput").value = val;
 }
 
-function initUI(){
-  document.getElementById("nickText").textContent=nickname;
-  document.getElementById("playerIdEl").textContent="#"+playerId;
-  renderRoleBadge();refreshUI();drawPreview();
+// ─── Canvas ──────────────────────────────────────────────────────────────────
+const canvas = document.getElementById("game");
+const ctx    = canvas.getContext("2d");
+canvas.style.display = "none";
+// Клік на канвас — стрибок (тільки під час гри, уникаємо подвійного стрибку)
+canvas.addEventListener("pointerup", () => jump());
+
+const pcanvas = document.getElementById("previewCanvas");
+const pctx    = pcanvas.getContext("2d");
+
+// ─── Малювання фону (основний canvas) ───────────────────────────────────────
+function drawBg() {
+  const skyH = GROUND_Y;           // висота неба
+  const gndH = CANVAS_H - GROUND_Y; // висота землі
+
+  if (currentBg === "day") {
+    // Небо
+    ctx.fillStyle = "#d4efff";
+    ctx.fillRect(0, 0, CANVAS_W, skyH);
+    // Хмарки
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.beginPath(); ctx.ellipse(140, 38, 38, 16, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(168, 32, 26, 13, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(530, 52, 34, 14, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(556, 47, 22, 11, 0, 0, Math.PI*2); ctx.fill();
+    // Земля — трава
+    ctx.fillStyle = "#7ec850";
+    ctx.fillRect(0, GROUND_Y, CANVAS_W, gndH);
+    ctx.fillStyle = "#5da832";
+    ctx.fillRect(0, GROUND_Y + 5, CANVAS_W, gndH - 5);
+    // Лінія землі
+    ctx.fillStyle = "#3d8010";
+    ctx.fillRect(0, GROUND_Y, CANVAS_W, 3);
+
+  } else if (currentBg === "desert") {
+    // Небо
+    ctx.fillStyle = "#f9dfa0";
+    ctx.fillRect(0, 0, CANVAS_W, skyH);
+    // Сонце
+    ctx.fillStyle = "#f5a623";
+    ctx.beginPath(); ctx.arc(710, 32, 22, 0, Math.PI*2); ctx.fill();
+    // Земля — пісок
+    ctx.fillStyle = "#d4a843";
+    ctx.fillRect(0, GROUND_Y, CANVAS_W, gndH);
+    ctx.fillStyle = "#b88c2e";
+    ctx.fillRect(0, GROUND_Y + 5, CANVAS_W, gndH - 5);
+    // Камінці
+    ctx.fillStyle = "#9a7020";
+    for (let i = 40; i < CANVAS_W; i += 130) {
+      ctx.fillRect(i, GROUND_Y + 3, 8, 3);
+      ctx.fillRect(i + 60, GROUND_Y + 5, 5, 2);
+    }
+    // Лінія землі
+    ctx.fillStyle = "#8b6010";
+    ctx.fillRect(0, GROUND_Y, CANVAS_W, 3);
+
+  } else {
+    // Ліс — небо
+    ctx.fillStyle = "#a8d88a";
+    ctx.fillRect(0, 0, CANVAS_W, skyH);
+    // Дерева (малюємо до лінії землі)
+    for (let i = 0; i < CANVAS_W; i += 110) {
+      ctx.fillStyle = "#8b5a2b";
+      ctx.fillRect(i + 3, GROUND_Y - 50, 9, 50);
+      ctx.fillStyle = "#2e8b57";
+      ctx.beginPath(); ctx.arc(i + 7, GROUND_Y - 55, 22, 0, Math.PI*2); ctx.fill();
+    }
+    // Земля — трава лісова
+    ctx.fillStyle = "#4a9040";
+    ctx.fillRect(0, GROUND_Y, CANVAS_W, gndH);
+    ctx.fillStyle = "#357030";
+    ctx.fillRect(0, GROUND_Y + 5, CANVAS_W, gndH - 5);
+    // Лінія землі
+    ctx.fillStyle = "#2a5a10";
+    ctx.fillRect(0, GROUND_Y, CANVAS_W, 3);
+  }
+}
+
+// ─── Малювання дино ──────────────────────────────────────────────────────────
+// dino.y = верх тіла. Коли стоїть: dino.y = GROUND_Y - DINO_H = 140
+function drawDino() {
+  const color = SKIN_COLORS[currentSkin];
+  if (dino.duck) {
+    // Присідання — широкий плаский силует
+    ctx.fillStyle = color;
+    ctx.fillRect(dino.x, dino.y + 18, 34, 12); // тіло
+    ctx.fillRect(dino.x + 20, dino.y + 10, 14, 10); // голова
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(dino.x + 30, dino.y + 12, 4, 4);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(dino.x + 31, dino.y + 13, 2, 2);
+  } else {
+    // Стоячи
+    ctx.fillStyle = color;
+    ctx.fillRect(dino.x,     dino.y + 8,  DINO_W, 16); // тіло
+    ctx.fillRect(dino.x + 4, dino.y,      18,     12); // голова
+    ctx.fillRect(dino.x - 4, dino.y + 12, 6,      5);  // хвіст
+    ctx.fillRect(dino.x + 2, dino.y + 24, 7,      6);  // ліва нога
+    ctx.fillRect(dino.x + 13,dino.y + 24, 7,      6);  // права нога
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(dino.x + 16, dino.y + 2, 5, 5);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(dino.x + 17, dino.y + 3, 3, 3);
+  }
+}
+
+// ─── Стрибок ─────────────────────────────────────────────────────────────────
+function jump() {
+  if (dino && dino.grounded && !gameOver && active) {
+    dino.dy = dino.jumpF;
+    dino.grounded = false;
+  }
+}
+
+// ─── Ігровий стан ────────────────────────────────────────────────────────────
+let dino, obstacles, frame, score, gameOver, gameOverAt, rafId;
+let speed, baseSpeed, running = false, active = false;
+
+// ─── Старт гри ───────────────────────────────────────────────────────────────
+function startGame() {
+  cancelAnimationFrame(rafId);
+  baseSpeed = SPEED_MAP[document.getElementById("levelSelect").value] || 4;
+  speed = baseSpeed;
+  running = false;
+  active = false;
+  dino = {
+    x: 60,
+    y: DINO_START_Y,    // 140 — верх тіла рівно над землею
+    dy: 0,
+    gravity: 0.65,
+    jumpF: -13,
+    grounded: true,
+    duck: false,
+  };
+  obstacles = [];
+  frame = 0;
+  score = 0;
+  gameOver = false;
+  gameOverAt = 0;
+
+  document.getElementById("menuCard").style.display = "none";
+  document.getElementById("gameOverCard").style.display = "none";
+  canvas.style.display = "block";
+  document.getElementById("scoreBar").style.display = "block";
+  document.getElementById("mobileControls").style.display = "flex";
+
+  // Невелика затримка перед стартом (дино стоїть 0.5с)
+  setTimeout(() => { active = true; }, 500);
+
+  rafId = requestAnimationFrame(loop);
+}
+
+// ─── Повернення до меню ──────────────────────────────────────────────────────
+function showMenu() {
+  cancelAnimationFrame(rafId);
+  active = false;
+  canvas.style.display = "none";
+  document.getElementById("scoreBar").style.display = "none";
+  document.getElementById("mobileControls").style.display = "none";
+  document.getElementById("gameOverCard").style.display = "none";
+  document.getElementById("menuCard").style.display = "block";
+}
+
+// ─── Клавіатура ──────────────────────────────────────────────────────────────
+document.addEventListener("keydown", e => {
+  if (!dino) return;
+  if ((e.key === "ArrowUp" || e.key === " ") && !gameOver) {
+    e.preventDefault();
+    jump();
+  }
+  if (e.key === "ArrowDown") { e.preventDefault(); if (dino) dino.duck = true; }
+  if (e.key === "Shift") running = true;
+});
+document.addEventListener("keyup", e => {
+  if (!dino) return;
+  if (e.key === "ArrowDown") dino.duck = false;
+  if (e.key === "Shift") running = false;
+});
+
+// ─── Головний цикл ───────────────────────────────────────────────────────────
+function loop() {
+
+  // ── Анімація смерті (900мс) ──
+  if (gameOver) {
+    const elapsed = Date.now() - gameOverAt;
+
+    drawBg();
+    // Перешкоди (стоять)
+    ctx.fillStyle = "#555";
+    obstacles.forEach(o => ctx.fillRect(o.x, o.y, o.w, o.h));
+    // Дино
+    drawDino();
+    // Рахунок
+    ctx.fillStyle = "#333"; ctx.font = "bold 14px Arial"; ctx.textAlign = "left";
+    ctx.fillText("Рахунок: " + score, 10, 18);
+
+    // Темна накладка — наростає
+    const alpha = Math.min(1, elapsed / 350);
+    ctx.fillStyle = "rgba(0,0,0," + (alpha * 0.5) + ")";
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+    // Текст — зʼявляється з fade
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 28px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("💀 Гру закінчено!", CANVAS_W / 2, CANVAS_H / 2 - 10);
+    ctx.font = "bold 15px Arial";
+    ctx.fillText("Рахунок: " + score, CANVAS_W / 2, CANVAS_H / 2 + 18);
+    ctx.globalAlpha = 1;
+    ctx.textAlign = "left";
+
+    if (elapsed >= 900) {
+      // Показуємо карточку game over
+      document.getElementById("finalScore").textContent = score;
+      document.getElementById("mobileControls").style.display = "none";
+      document.getElementById("gameOverCard").style.display = "block";
+      return; // зупиняємо RAF
+    }
+
+    rafId = requestAnimationFrame(loop);
+    return;
+  }
+
+  // ── Звичайний кадр ──
+  frame++;
+
+  // Фізика дино
+  dino.y += dino.dy;
+  dino.dy += dino.gravity;
+
+  // Приземлення: нижній край дино = GROUND_Y
+  if (dino.y + DINO_H >= GROUND_Y) {
+    dino.y = GROUND_Y - DINO_H; // = DINO_START_Y = 140
+    dino.dy = 0;
+    dino.grounded = true;
+  }
+
+  // Генерація перешкод (затримка 80 кадрів на старті)
+  if (frame > 80 && frame % 90 === 0) {
+    const obsH = 32 + Math.floor(Math.random() * 16); // 32–47 px висоти
+    obstacles.push({
+      x: CANVAS_W + 10,
+      y: GROUND_Y - obsH,  // верх перешкоди (низ = GROUND_Y)
+      w: 20,
+      h: obsH,
+    });
+  }
+
+  // Швидкість
+  speed = baseSpeed + Math.floor(frame / 600) * 0.5;
+  if (running) speed += 3;
+
+  // Рух перешкод та перевірка зіткнень
+  const mg = 5; // margin для "чесного" хітбоксу
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    obstacles[i].x -= speed;
+    if (obstacles[i].x < -60) { obstacles.splice(i, 1); continue; }
+
+    const o = obstacles[i];
+    // Хітбокс дино залежно від стану
+    const dh = dino.duck ? 12 : DINO_H;
+    const dy = dino.duck ? dino.y + 18 : dino.y;
+    const dw = dino.duck ? 34 : DINO_W;
+
+    if (
+      dino.x + dw - mg > o.x + mg &&
+      dino.x + mg    < o.x + o.w - mg &&
+      dy + dh - mg   > o.y + mg &&
+      dy + mg        < o.y + o.h - mg
+    ) {
+      // Зіткнення!
+      gameOver = true;
+      gameOverAt = Date.now();
+      active = false;
+      const earned = Math.floor(score / 10);
+      coins += earned;
+      save("coins", coins);
+      refreshUI();
+      document.getElementById("earnedCoins").textContent = earned;
+      // Карточку покажемо через 900мс (в gameOver-гілці)
+      break;
+    }
+  }
+
+  score++;
+  document.getElementById("scoreLive").textContent = score;
+
+  // ── Відмальовка ──
+  drawBg();
+  ctx.fillStyle = "#555";
+  obstacles.forEach(o => ctx.fillRect(o.x, o.y, o.w, o.h));
+  drawDino();
+  ctx.fillStyle = "#333"; ctx.font = "bold 14px Arial"; ctx.textAlign = "left";
+  ctx.fillText("Рахунок: " + score, 10, 18);
+
+  rafId = requestAnimationFrame(loop);
+}
+
+// ─── UI ──────────────────────────────────────────────────────────────────────
+function initUI() {
+  document.getElementById("nickText").textContent = nickname;
+  document.getElementById("playerIdEl").textContent = "#" + playerId;
+  refreshUI();
+  drawPreview();
 }
 initUI();
 
-function refreshUI(){
-  document.getElementById("coinCount").textContent=coins;
-  document.getElementById("profileCoins").textContent=coins;
-  ["black","green","red"].forEach(s=>{
-    const b=document.getElementById("skin-"+s);b.classList.toggle("active",s===currentSkin);
-    const p=b.querySelector(".price-tag");if(p)p.style.display=ownedSkins.includes(s)?"none":"";
+function refreshUI() {
+  document.getElementById("coinCount").textContent = coins;
+  document.getElementById("profileCoins").textContent = coins;
+  ["black","green","red"].forEach(s => {
+    const b = document.getElementById("skin-" + s);
+    b.classList.toggle("active", s === currentSkin);
+    const p = b.querySelector(".price-tag");
+    if (p) p.style.display = ownedSkins.includes(s) ? "none" : "";
   });
-  ["day","desert","forest"].forEach(b=>{
-    const el=document.getElementById("bg-"+b);el.classList.toggle("active",b===currentBg);
-    const p=el.querySelector(".price-tag");if(p)p.style.display=ownedBgs.includes(b)?"none":"";
+  ["day","desert","forest"].forEach(b => {
+    const el = document.getElementById("bg-" + b);
+    el.classList.toggle("active", b === currentBg);
+    const p = el.querySelector(".price-tag");
+    if (p) p.style.display = ownedBgs.includes(b) ? "none" : "";
   });
   drawPreview();
 }
 
-function toggleProfile(){document.getElementById("profileWrap").classList.toggle("open");document.getElementById("shopWrap").classList.remove("open");drawPreview();}
-function toggleShop(){document.getElementById("shopWrap").classList.toggle("open");document.getElementById("profileWrap").classList.remove("open");}
-function startEditNick(){document.getElementById("nickInput").value=nickname;document.getElementById("nickDisplay").style.display="none";document.getElementById("nickEdit").style.display="flex";document.getElementById("nickInput").focus();}
-function saveNick(){
-  const val=document.getElementById("nickInput").value.trim()||"Гравець";
-  nickname=val;save("nickname",nickname);
-  document.getElementById("nickText").textContent=nickname;
-  document.getElementById("nickDisplay").style.display="flex";
-  document.getElementById("nickEdit").style.display="none";
-  registerPlayer();
-}
-function cancelEditNick(){document.getElementById("nickDisplay").style.display="flex";document.getElementById("nickEdit").style.display="none";}
-function buySkin(s,p){if(!ownedSkins.includes(s)){if(coins<p){showPromoMsg("Недостатньо монет!","#cc2222");return;}coins-=p;ownedSkins.push(s);save("ownedSkins",ownedSkins);save("coins",coins);}currentSkin=s;save("skin",s);refreshUI();}
-function buyBg(b,p){if(!ownedBgs.includes(b)){if(coins<p){showPromoMsg("Недостатньо монет!","#cc2222");return;}coins-=p;ownedBgs.push(b);save("ownedBg",ownedBgs);save("coins",coins);}currentBg=b;save("bg",b);refreshUI();}
-function usePromo(){
-  const code=document.getElementById("promoInput").value.trim();if(!code)return;
-  if(code===ADMIN_CODE){openAdmin();document.getElementById("promoInput").value="";showPromoMsg("🔑 Адмін-панель відкрита!","#6c47ff");return;}
-  if(usedPromos.includes(code)){showPromoMsg("Код вже використано!","#cc2222");return;}
-  let bonus=0;
-  if(code==="7В")bonus=100;else if(code==="Nasklio")bonus=9999;else{showPromoMsg("Невірний код!","#cc2222");return;}
-  usedPromos.push(code);save("usedPromos",usedPromos);coins+=bonus;save("coins",coins);refreshUI();
-  showPromoMsg("+"+bonus+" монет! 🎉","#22aa44");document.getElementById("promoInput").value="";
-}
-function showPromoMsg(t,c){const e=document.getElementById("promoMsg");e.textContent=t;e.style.color=c;}
+// ─── Preview ─────────────────────────────────────────────────────────────────
+function drawPreview() {
+  const W = 200, H = 100, gy = 68;
 
-function drawBg(){
-  if(currentBg==="day"){ctx.fillStyle="#dff3ff";ctx.fillRect(0,0,CANVAS_W,CANVAS_H);}
-  else if(currentBg==="desert"){ctx.fillStyle="#f4d29c";ctx.fillRect(0,0,CANVAS_W,CANVAS_H);ctx.fillStyle="#e0b878";ctx.fillRect(0,GROUND_Y+30,CANVAS_W,CANVAS_H-GROUND_Y-30);}
-  else{ctx.fillStyle="#87c77b";ctx.fillRect(0,0,CANVAS_W,CANVAS_H);for(let i=0;i<CANVAS_W;i+=100){ctx.fillStyle="#8b5a2b";ctx.fillRect(i,120,10,60);ctx.fillStyle="#2e8b57";ctx.beginPath();ctx.arc(i+5,110,25,0,Math.PI*2);ctx.fill();}}
-  ctx.fillStyle="#333";ctx.fillRect(0,GROUND_Y+30,CANVAS_W,2);
-}
-function drawDino(){
-  const h=dino.duck?15:30,y=dino.duck?dino.y+15:dino.y;
-  ctx.fillStyle=SKIN_COLORS[currentSkin];ctx.fillRect(dino.x,y,30,h);
-  if(!dino.duck){ctx.fillStyle="#fff";ctx.fillRect(dino.x+22,y+4,6,6);ctx.fillStyle="#000";ctx.fillRect(dino.x+24,y+6,3,3);}
-}
-function jump(){if(dino&&dino.grounded&&!gameOver){dino.dy=dino.jump;dino.grounded=false;}}
-function startGame(){
-  cancelAnimationFrame(rafId);
-  baseSpeed=SPEED_MAP[document.getElementById("levelSelect").value];
-  speed=baseSpeed;running=false;
-  dino={x:60,y:GROUND_Y,dy:0,gravity:0.6,jump:-12,grounded:true,duck:false};
-  obstacles=[];frame=0;score=0;gameOver=false;
-  document.getElementById("menuCard").style.display="none";
-  document.getElementById("gameOverCard").style.display="none";
-  canvas.style.display="block";
-  document.getElementById("scoreBar").style.display="block";
-  document.getElementById("mobileControls").style.display="flex";
-  rafId=requestAnimationFrame(loop);
-}
-function showMenu(){
-  cancelAnimationFrame(rafId);canvas.style.display="none";
-  document.getElementById("scoreBar").style.display="none";
-  document.getElementById("mobileControls").style.display="none";
-  document.getElementById("gameOverCard").style.display="none";
-  document.getElementById("menuCard").style.display="block";
-}
-document.addEventListener("keydown",e=>{
-  if(!dino)return;
-  if((e.key==="ArrowUp"||e.key===" ")&&dino.grounded&&!gameOver)jump();
-  if(e.key==="ArrowDown")dino.duck=true;if(e.key==="Shift")running=true;
-});
-document.addEventListener("keyup",e=>{
-  if(!dino)return;
-  if(e.key==="ArrowDown")dino.duck=false;if(e.key==="Shift")running=false;
-});
-function loop(){
-  if(!gameOver){
-    frame++;dino.y+=dino.dy;dino.dy+=dino.gravity;
-    if(dino.y>=GROUND_Y){dino.y=GROUND_Y;dino.dy=0;dino.grounded=true;}
-    if(frame%90===0)obstacles.push({x:CANVAS_W,y:GROUND_Y-10,w:20,h:40});
-    speed=baseSpeed+Math.floor(frame/600)*0.5;if(running)speed+=3;
-    for(let i=obstacles.length-1;i>=0;i--){
-      obstacles[i].x-=speed;
-      if(obstacles[i].x<-60){obstacles.splice(i,1);continue;}
-      const o=obstacles[i],dh=dino.duck?15:30,dy=dino.duck?dino.y+15:dino.y,mg=4;
-      if(dino.x+30-mg>o.x+mg&&dino.x+mg<o.x+o.w-mg&&dy+dh-mg>o.y+mg&&dy+mg<o.y+o.h-mg){
-        gameOver=true;const earned=Math.floor(score/10);coins+=earned;save("coins",coins);refreshUI();
-        document.getElementById("finalScore").textContent=score;
-        document.getElementById("earnedCoins").textContent=earned;
-        document.getElementById("gameOverCard").style.display="block";
-        document.getElementById("mobileControls").style.display="none";break;
-      }
+  if (currentBg === "day") {
+    pctx.fillStyle = "#d4efff"; pctx.fillRect(0, 0, W, gy);
+    pctx.fillStyle = "#7ec850"; pctx.fillRect(0, gy, W, H - gy);
+    pctx.fillStyle = "#3d8010"; pctx.fillRect(0, gy, W, 2);
+  } else if (currentBg === "desert") {
+    pctx.fillStyle = "#f9dfa0"; pctx.fillRect(0, 0, W, gy);
+    pctx.fillStyle = "#d4a843"; pctx.fillRect(0, gy, W, H - gy);
+    pctx.fillStyle = "#8b6010"; pctx.fillRect(0, gy, W, 2);
+  } else {
+    pctx.fillStyle = "#a8d88a"; pctx.fillRect(0, 0, W, gy);
+    for (let i = 0; i < W; i += 50) {
+      pctx.fillStyle = "#8b5a2b"; pctx.fillRect(i + 1, gy - 22, 4, 22);
+      pctx.fillStyle = "#2e8b57"; pctx.beginPath(); pctx.arc(i + 3, gy - 24, 10, 0, Math.PI*2); pctx.fill();
     }
-    score++;document.getElementById("scoreLive").textContent=score;
+    pctx.fillStyle = "#4a9040"; pctx.fillRect(0, gy, W, H - gy);
+    pctx.fillStyle = "#2a5a10"; pctx.fillRect(0, gy, W, 2);
   }
-  drawBg();ctx.fillStyle="#555";obstacles.forEach(o=>ctx.fillRect(o.x,o.y,o.w,o.h));
-  drawDino();ctx.fillStyle="#333";ctx.font="bold 14px Arial";ctx.fillText("Score: "+score,10,18);
-  if(!gameOver)rafId=requestAnimationFrame(loop);
+
+  // Міні-дино
+  const color = SKIN_COLORS[currentSkin];
+  const dx = 28, dy = gy - 14;
+  pctx.fillStyle = color;
+  pctx.fillRect(dx, dy - 6, 10, 8);    // тіло
+  pctx.fillRect(dx + 3, dy - 10, 8, 6); // голова
+  pctx.fillRect(dx + 2, dy + 2, 3, 3);  // ліва нога
+  pctx.fillRect(dx + 6, dy + 2, 3, 3);  // права нога
+  pctx.fillStyle = "#fff"; pctx.fillRect(dx + 8, dy - 9, 3, 3);
+  pctx.fillStyle = "#000"; pctx.fillRect(dx + 9, dy - 8, 2, 2);
+
+  document.getElementById("previewLabel").textContent =
+    SKIN_LABELS[currentSkin] + " · " + BG_LABELS[currentBg];
+}
+
+// ─── Панелі профіль / магазин ────────────────────────────────────────────────
+function toggleProfile() {
+  document.getElementById("profileWrap").classList.toggle("open");
+  document.getElementById("shopWrap").classList.remove("open");
+  drawPreview();
+}
+function toggleShop() {
+  document.getElementById("shopWrap").classList.toggle("open");
+  document.getElementById("profileWrap").classList.remove("open");
+}
+
+// ─── Нік ─────────────────────────────────────────────────────────────────────
+function startEditNick() {
+  document.getElementById("nickInput").value = nickname;
+  document.getElementById("nickDisplay").style.display = "none";
+  document.getElementById("nickEdit").style.display = "flex";
+  document.getElementById("nickInput").focus();
+}
+function saveNick() {
+  const val = document.getElementById("nickInput").value.trim() || "Гравець";
+  nickname = val; save("nickname", nickname);
+  document.getElementById("nickText").textContent = nickname;
+  document.getElementById("nickDisplay").style.display = "flex";
+  document.getElementById("nickEdit").style.display = "none";
+}
+function cancelEditNick() {
+  document.getElementById("nickDisplay").style.display = "flex";
+  document.getElementById("nickEdit").style.display = "none";
+}
+
+// ─── Магазин ─────────────────────────────────────────────────────────────────
+function buySkin(skin, price) {
+  if (!ownedSkins.includes(skin)) {
+    if (coins < price) { showPromoMsg("Недостатньо монет!", "#cc2222"); return; }
+    coins -= price; ownedSkins.push(skin);
+    save("ownedSkins", ownedSkins); save("coins", coins);
+  }
+  currentSkin = skin; save("skin", skin); refreshUI();
+}
+function buyBg(bg, price) {
+  if (!ownedBgs.includes(bg)) {
+    if (coins < price) { showPromoMsg("Недостатньо монет!", "#cc2222"); return; }
+    coins -= price; ownedBgs.push(bg);
+    save("ownedBg", ownedBgs); save("coins", coins);
+  }
+  currentBg = bg; save("bg", bg); refreshUI();
+}
+
+// ─── Промокоди ───────────────────────────────────────────────────────────────
+const PROMCODES = { "7В": 100, "Nasklio": 9999 };
+function usePromo() {
+  const code = document.getElementById("promoInput").value.trim();
+  if (!code) return;
+  if (code === ADMIN_CODE) {
+    openAdmin();
+    document.getElementById("promoInput").value = "";
+    showPromoMsg("🔑 Адмін-панель відкрита!", "#6c47ff");
+    return;
+  }
+  if (usedPromos.includes(code)) { showPromoMsg("Код вже використано!", "#cc2222"); return; }
+  const bonus = PROMCODES[code];
+  if (!bonus) { showPromoMsg("Невірний код!", "#cc2222"); return; }
+  usedPromos.push(code); save("usedPromos", usedPromos);
+  coins += bonus; save("coins", coins); refreshUI();
+  showPromoMsg("+" + bonus + " монет! 🎉", "#22aa44");
+  document.getElementById("promoInput").value = "";
+}
+function showPromoMsg(t, c) {
+  const e = document.getElementById("promoMsg");
+  e.textContent = t; e.style.color = c;
+  setTimeout(() => { e.textContent = ""; }, 3000);
 }
 </script>
 </body>

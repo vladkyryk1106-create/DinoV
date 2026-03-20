@@ -6,12 +6,8 @@
 <style>
 * { box-sizing: border-box; }
 body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(#dff3ff, #ffffff);
+  margin: 0; display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; background: linear-gradient(#dff3ff, #ffffff);
   font-family: Arial, sans-serif;
 }
 #gameContainer { text-align: center; max-width: 860px; width: 100%; padding: 16px; }
@@ -25,7 +21,7 @@ h1 { margin: 0 0 12px; font-size: 26px; color: #222; }
 .btn-profile { padding:8px 18px; background:#2563eb; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; }
 .btn-shop-main { padding:8px 18px; background:#6c47ff; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; }
 .panel-wrap { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.35s ease, opacity 0.3s ease; }
-.panel-wrap.open { max-height: 600px; opacity: 1; }
+.panel-wrap.open { max-height: 700px; opacity: 1; }
 #profile {
   background:#fff; border:2px solid #ddd; border-radius:12px;
   padding:16px; margin-bottom:12px;
@@ -34,7 +30,7 @@ h1 { margin: 0 0 12px; font-size: 26px; color: #222; }
 #previewCanvas { border:2px solid #ccc; border-radius:8px; display:block; }
 .profile-data { flex:1; min-width:180px; }
 .label-small { font-size:12px; color:#888; margin-bottom:2px; }
-.nick-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.nick-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
 .nick-text { font-size:20px; font-weight:bold; color:#222; }
 .btn-edit { padding:3px 10px; background:#f0ebff; border:1.5px solid #6c47ff; border-radius:6px; cursor:pointer; font-size:13px; color:#6c47ff; font-weight:bold; }
 .nick-input { padding:5px 10px; border:1.5px solid #6c47ff; border-radius:6px; font-size:16px; width:140px; }
@@ -45,6 +41,14 @@ h1 { margin: 0 0 12px; font-size: 26px; color: #222; }
   color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe;
   border-radius:6px; padding:4px 10px; display:inline-block; margin-bottom:10px;
 }
+.role-badge {
+  display:inline-block; padding:2px 10px; border-radius:20px;
+  font-size:12px; font-weight:bold; margin-left:6px; vertical-align:middle;
+}
+.role-admin    { background:#fde8ff; color:#9c27b0; border:1px solid #d580ff; }
+.role-tester   { background:#e0f0ff; color:#1565c0; border:1px solid #90caf9; }
+.role-moder    { background:#e8f5e9; color:#2e7d32; border:1px solid #81c784; }
+.role-vip      { background:#fff8e1; color:#f57f17; border:1px solid #ffd54f; }
 #shop { background:#fff; border:2px solid #ddd; border-radius:10px; padding:16px; margin-bottom:12px; text-align:left; }
 #shop h3 { margin:0 0 10px; }
 #shop h4 { margin:8px 0 6px; font-size:14px; color:#555; }
@@ -80,14 +84,14 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
 .btn-jump { background:#6c47ff; }
 .btn-duck { background:#555; }
 
-/* Адмін панель */
+/* ── Адмін панель ── */
 #adminPanel {
-  display:none;
-  position:fixed; top:12px; right:12px; z-index:9999;
+  display:none; position:fixed; top:12px; right:12px; z-index:9999;
   background:#1a1a2e; color:#eee; border-radius:12px;
-  padding:16px; width:240px;
-  box-shadow:0 4px 24px rgba(0,0,0,0.55);
+  padding:16px; width:310px;
+  box-shadow:0 4px 28px rgba(0,0,0,0.6);
   border:2px solid #6c47ff; font-size:13px;
+  max-height:calc(100vh - 24px); overflow-y:auto;
 }
 #adminPanel.open { display:block; }
 .admin-title { font-size:15px; font-weight:bold; color:#a78bfa; }
@@ -98,7 +102,7 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
 .stat-visits .stat-val { color:#22d3ee; }
 .stat-online .stat-val { color:#4ade80; }
 .stat-online { text-align:right; }
-.admin-field-label { color:#888; font-size:11px; margin-bottom:4px; }
+.admin-field-label { color:#888; font-size:11px; margin-bottom:4px; text-transform:uppercase; }
 .admin-row { display:flex; gap:4px; margin-bottom:8px; }
 .admin-input {
   flex:1; padding:5px 8px;
@@ -108,7 +112,28 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
 .admin-save { padding:5px 10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; }
 .admin-save-id { background:#6c47ff; color:#fff; }
 .admin-save-coins { background:#22aa44; color:#fff; }
-.admin-footer { color:#555; font-size:10px; text-align:center; margin-top:8px; }
+.admin-divider { border:none; border-top:1px solid #2a2a3e; margin:10px 0; }
+.admin-section-title {
+  color:#a78bfa; font-size:12px; font-weight:bold; text-transform:uppercase;
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
+}
+.players-list {
+  max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:5px;
+}
+.players-list::-webkit-scrollbar { width:4px; }
+.players-list::-webkit-scrollbar-track { background:#0f0f1a; border-radius:2px; }
+.players-list::-webkit-scrollbar-thumb { background:#444; border-radius:2px; }
+.player-row {
+  background:#0f0f1a; border-radius:7px; padding:7px 8px;
+}
+.player-nick { font-weight:bold; color:#eee; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:150px; }
+.player-pid { font-family:monospace; color:#888; font-size:11px; margin-bottom:4px; display:block; }
+.role-select {
+  width:100%; background:#1a1a2e; border:1px solid #444; color:#eee; border-radius:5px;
+  padding:3px 5px; font-size:11px; cursor:pointer;
+}
+.no-players { color:#555; font-size:12px; text-align:center; padding:12px 0; }
+.admin-footer { color:#555; font-size:10px; text-align:center; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -139,14 +164,18 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
     <input class="admin-input" id="adminCoinsInput" type="number" min="0" placeholder="0">
     <button class="admin-save admin-save-coins" onclick="adminSaveCoins()">✓</button>
   </div>
+  <hr class="admin-divider">
+  <div class="admin-section-title">
+    <span>👥 Гравці</span>
+    <span id="adminPlayerCount" style="color:#888;font-weight:normal"></span>
+  </div>
+  <div class="players-list" id="adminPlayersList"></div>
   <div class="admin-footer">Dino Game ULTRA+ Admin</div>
 </div>
 
 <div id="gameContainer">
-
   <h1>🦖 Dino Game ULTRA+</h1>
   <div id="coinDisplay">🪙 <span id="coinCount">0</span> монет</div><br>
-
   <div class="top-btns">
     <button class="btn-profile" onclick="toggleProfile()">👤 Профіль</button>
     <button class="btn-shop-main" onclick="toggleShop()">🛒 Магазин</button>
@@ -163,6 +192,7 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
         <div class="label-small">Нік гравця</div>
         <div class="nick-row" id="nickDisplay">
           <span class="nick-text" id="nickText"></span>
+          <span id="roleBadgeEl"></span>
           <button class="btn-edit" onclick="startEditNick()">✏️ Змінити</button>
         </div>
         <div class="nick-row" id="nickEdit" style="display:none">
@@ -184,15 +214,9 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
       <h3>Магазин</h3>
       <h4>Скіни діно:</h4>
       <div class="btn-row">
-        <button class="skin-btn" id="skin-black" onclick="buySkin('black',0)">
-          <span class="skin-dot" style="background:#222"></span> Чорний
-        </button>
-        <button class="skin-btn" id="skin-green" onclick="buySkin('green',50)">
-          <span class="skin-dot" style="background:#22aa44"></span> Зелений <span class="price-tag">(50🪙)</span>
-        </button>
-        <button class="skin-btn" id="skin-red" onclick="buySkin('red',100)">
-          <span class="skin-dot" style="background:#cc2222"></span> Червоний <span class="price-tag">(100🪙)</span>
-        </button>
+        <button class="skin-btn" id="skin-black" onclick="buySkin('black',0)"><span class="skin-dot" style="background:#222"></span> Чорний</button>
+        <button class="skin-btn" id="skin-green" onclick="buySkin('green',50)"><span class="skin-dot" style="background:#22aa44"></span> Зелений <span class="price-tag">(50🪙)</span></button>
+        <button class="skin-btn" id="skin-red" onclick="buySkin('red',100)"><span class="skin-dot" style="background:#cc2222"></span> Червоний <span class="price-tag">(100🪙)</span></button>
       </div>
       <h4>Фони:</h4>
       <div class="btn-row">
@@ -238,7 +262,6 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
 
   <canvas id="game" width="800" height="200"></canvas>
   <div id="scoreBar">Рахунок: <span id="scoreLive">0</span></div>
-
   <div id="mobileControls">
     <button class="btn-mobile btn-jump" onpointerdown="jump()">⬆ Стрибок</button>
     <button class="btn-mobile btn-duck"
@@ -247,44 +270,58 @@ canvas#game { border:2px solid #333; border-radius:6px; max-width:100%; cursor:p
       onpointerleave="dino&&(dino.duck=false)"
     >⬇ Присісти</button>
   </div>
-
 </div>
 
 <script>
-const CANVAS_W=800, CANVAS_H=200, GROUND_Y=150;
+const CANVAS_W=800,CANVAS_H=200,GROUND_Y=150;
 const SPEED_MAP={easy:4,medium:6,hard:9};
 const SKIN_COLORS={black:"#222",green:"#22aa44",red:"#cc2222"};
 const SKIN_LABELS={black:"Чорний",green:"Зелений",red:"Червоний"};
 const BG_LABELS={day:"☀️ День",desert:"🏜️ Пустеля",forest:"🌲 Ліс"};
 const ADMIN_CODE="Qz3.yR!7mN?2xP.9qZ5!";
 const SESSION_KEY="hb_"+Math.random().toString(36).slice(2,10);
+const ROLE_META={
+  "":     {label:"",cls:""},
+  admin:  {label:"👑 Адмін",  cls:"role-admin"},
+  tester: {label:"🧪 Тестер", cls:"role-tester"},
+  moder:  {label:"🛡 Модер",  cls:"role-moder"},
+  vip:    {label:"⭐ VIP",    cls:"role-vip"},
+};
 
-function load(key,def){try{const v=localStorage.getItem(key);return v!==null?JSON.parse(v):def;}catch{return def;}}
-function save(key,val){localStorage.setItem(key,JSON.stringify(val));}
+function load(k,d){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch{return d;}}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
 
 function genId(){
-  const ts=Date.now().toString().slice(-6);
-  const rnd=Math.floor(Math.random()*10000).toString().padStart(4,"0");
-  return ts+rnd;
+  return Date.now().toString().slice(-6)+Math.floor(Math.random()*10000).toString().padStart(4,"0");
 }
 
-let coins=load("coins",0), currentBg=load("bg","day"), currentSkin=load("skin","black");
-let ownedBgs=load("ownedBg",["day"]), ownedSkins=load("ownedSkins",["black"]), usedPromos=load("usedPromos",[]);
+let coins=load("coins",0),currentBg=load("bg","day"),currentSkin=load("skin","black");
+let ownedBgs=load("ownedBg",["day"]),ownedSkins=load("ownedSkins",["black"]),usedPromos=load("usedPromos",[]);
 let nickname=load("nickname","Гравець");
 let playerId=localStorage.getItem("playerId");
 if(!playerId||!/^\d+$/.test(playerId)){playerId=genId();localStorage.setItem("playerId",playerId);}
+
+/* ── Реєстр гравців ── */
+function registerPlayer(){
+  const reg=load("playerRegistry",[]);
+  const entry={id:playerId,nick:nickname,lastSeen:Date.now()};
+  const idx=reg.findIndex(p=>p.id===playerId);
+  if(idx>=0)reg[idx]=entry;else reg.push(entry);
+  save("playerRegistry",reg);
+}
+registerPlayer();
+
+function getMyRole(){return(load("playerRoles",{}))[playerId]||"";}
 
 /* ── Відвідування ── */
 const totalVisits=(parseInt(localStorage.getItem("totalVisits")||"0"))+1;
 localStorage.setItem("totalVisits",String(totalVisits));
 
-/* ── Хартбіт онлайн ── */
+/* ── Онлайн ── */
 function updateHeartbeat(){localStorage.setItem(SESSION_KEY,String(Date.now()));}
 function countOnline(){
   const now=Date.now();let c=0;
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&k.startsWith("hb_")){const t=parseInt(localStorage.getItem(k)||"0");if(now-t<15000)c++;}
+  for(let i=0;i<localStorage(now-parseInt(localStorage.getItem(k)||"0")<15000)c++;}
   }
   return Math.max(1,c);
 }
@@ -292,22 +329,65 @@ updateHeartbeat();
 setInterval(()=>{updateHeartbeat();document.getElementById("adminOnline").textContent=countOnline();},5000);
 window.addEventListener("beforeunload",()=>localStorage.removeItem(SESSION_KEY));
 
-/* ── Адмін панель ── */
+/* ── Бейдж ролі ── */
+function renderRoleBadge(){
+  const role=getMyRole(),el=document.getElementById("roleBadgeEl");
+  if(!role){el.innerHTML="";return;}
+  const m=ROLE_META[role];
+  el.innerHTML=`<span class="role-badge ${m.cls}">${m.label}</span>`;
+}
+
+/* ── Адмін: список гравців ── */
+function formatTimeAgo(ts){
+  const d=Math.floor((Date.now()-ts)/1000);
+  if(d<60)return"щойно";if(d<3600)return Math.floor(d/60)+"хв тому";
+  if(d<86400)return Math.floor(d/3600)+"год тому";return Math.floor(d/86400)+"дн тому";
+}
+function escHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function renderPlayersList(){
+  const list=document.getElementById("adminPlayersList");
+  const reg=[...load("playerRegistry",[])].sort((a,b)=>b.lastSeen-a.lastSeen);
+  const roles=load("playerRoles",{});
+  document.getElementById("adminPlayerCount").textContent=reg.length+" гравців";
+  if(!reg.length){list.innerHTML='<div class="no-players">Поки немає гравців</div>';return;}
+  list.innerHTML=reg.map(p=>{
+    const role=roles[p.id]||"";
+    const opts=Object.keys(ROLE_META).map(r=>`<option value="${r}"${role===r?" selected":""}>${r===""?"— без ролі —":ROLE_META[r].label}</option>`).join("");
+    return`<div class="player-row">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="player-nick">${escHtml(p.nick)}</span>
+        <span style="color:#555;font-size:10px">${formatTimeAgo(p.lastSeen)}</span>
+      </div>
+      <span class="player-pid">#${p.id}</span>
+      <select class="role-select" onchange="setPlayerRole('${p.id}',this.value)">${opts}</select>
+    </div>`;
+  }).join("");
+}
+
+function setPlayerRole(pid,role){
+  const roles=load("playerRoles",{});
+  if(role==="")delete roles[pid];else roles[pid]=role;
+  save("playerRoles",roles);
+  renderRoleBadge();
+}
+
 function openAdmin(){
   document.getElementById("adminVisits").textContent=totalVisits;
   document.getElementById("adminOnline").textContent=countOnline();
   document.getElementById("adminIdInput").value=playerId;
   document.getElementById("adminCoinsInput").value=coins;
+  renderPlayersList();
   document.getElementById("adminPanel").classList.add("open");
 }
 function adminSaveId(){
   const val=document.getElementById("adminIdInput").value.replace(/\D/g,"").slice(0,10);
   if(!val)return;
-  const padded=val.padStart(10,"0");
-  localStorage.setItem("playerId",padded);
-  playerId=padded;
-  document.getElementById("playerIdEl").textContent="#"+padded;
-  document.getElementById("adminIdInput").value=padded;
+  const p=val.padStart(10,"0");
+  localStorage.setItem("playerId",p);playerId=p;
+  document.getElementById("playerIdEl").textContent="#"+p;
+  document.getElementById("adminIdInput").value=p;
+  registerPlayer();
 }
 function adminSaveCoins(){
   const val=Math.max(0,parseInt(document.getElementById("adminCoinsInput").value)||0);
@@ -315,12 +395,12 @@ function adminSaveCoins(){
   document.getElementById("adminCoinsInput").value=val;
 }
 
-let dino, obstacles, frame, score, gameOver, rafId, speed, baseSpeed, running=false;
-const canvas=document.getElementById("game"), ctx=canvas.getContext("2d");
-canvas.style.display="none";
-canvas.onclick=()=>jump();
+/* ── Canvas ── */
+let dino,obstacles,frame,score,gameOver,rafId,speed,baseSpeed,running=false;
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+canvas.style.display="none";canvas.onclick=()=>jump();
 
-const pcanvas=document.getElementById("previewCanvas"), pctx=pcanvas.getContext("2d");
+const pcanvas=document.getElementById("previewCanvas"),pctx=pcanvas.getContext("2d");
 function drawPreview(){
   const W=200,H=100,gy=68;
   if(currentBg==="day"){pctx.fillStyle="#dff3ff";pctx.fillRect(0,0,W,H);}
@@ -329,8 +409,7 @@ function drawPreview(){
   pctx.fillStyle="#333";pctx.fillRect(0,gy+12,W,2);
   const dx=30,dy=gy-15;
   pctx.fillStyle=SKIN_COLORS[currentSkin];pctx.fillRect(dx,dy,16,15);
-  pctx.fillStyle="#fff";pctx.fillRect(dx+12,dy+2,3,3);
-  pctx.fillStyle="#000";pctx.fillRect(dx+13,dy+3,2,2);
+  pctx.fillStyle="#fff";pctx.fillRect(dx+12,dy+2,3,3);pctx.fillStyle="#000";pctx.fillRect(dx+13,dy+3,2,2);
   pctx.fillStyle=SKIN_COLORS[currentSkin];pctx.fillRect(dx+2,dy+15,4,5);pctx.fillRect(dx+8,dy+15,4,5);
   document.getElementById("previewLabel").textContent=SKIN_LABELS[currentSkin]+" · "+BG_LABELS[currentBg];
 }
@@ -338,7 +417,7 @@ function drawPreview(){
 function initUI(){
   document.getElementById("nickText").textContent=nickname;
   document.getElementById("playerIdEl").textContent="#"+playerId;
-  refreshUI(); drawPreview();
+  renderRoleBadge();refreshUI();drawPreview();
 }
 initUI();
 
@@ -346,13 +425,11 @@ function refreshUI(){
   document.getElementById("coinCount").textContent=coins;
   document.getElementById("profileCoins").textContent=coins;
   ["black","green","red"].forEach(s=>{
-    const b=document.getElementById("skin-"+s);
-    b.classList.toggle("active",s===currentSkin);
+    const b=document.getElementById("skin-"+s);b.classList.toggle("active",s===currentSkin);
     const p=b.querySelector(".price-tag");if(p)p.style.display=ownedSkins.includes(s)?"none":"";
   });
   ["day","desert","forest"].forEach(b=>{
-    const el=document.getElementById("bg-"+b);
-    el.classList.toggle("active",b===currentBg);
+    const el=document.getElementById("bg-"+b);el.classList.toggle("active",b===currentBg);
     const p=el.querySelector(".price-tag");if(p)p.style.display=ownedBgs.includes(b)?"none":"";
   });
   drawPreview();
@@ -361,30 +438,25 @@ function refreshUI(){
 function toggleProfile(){document.getElementById("profileWrap").classList.toggle("open");document.getElementById("shopWrap").classList.remove("open");drawPreview();}
 function toggleShop(){document.getElementById("shopWrap").classList.toggle("open");document.getElementById("profileWrap").classList.remove("open");}
 function startEditNick(){document.getElementById("nickInput").value=nickname;document.getElementById("nickDisplay").style.display="none";document.getElementById("nickEdit").style.display="flex";document.getElementById("nickInput").focus();}
-function saveNick(){const val=document.getElementById("nickInput").value.trim()||"Гравець";nickname=val;save("nickname",nickname);document.getElementById("nickText").textContent=nickname;document.getElementById("nickDisplay").style.display="flex";document.getElementById("nickEdit").style.display="none";}
+function saveNick(){
+  const val=document.getElementById("nickInput").value.trim()||"Гравець";
+  nickname=val;save("nickname",nickname);
+  document.getElementById("nickText").textContent=nickname;
+  document.getElementById("nickDisplay").style.display="flex";
+  document.getElementById("nickEdit").style.display="none";
+  registerPlayer();
+}
 function cancelEditNick(){document.getElementById("nickDisplay").style.display="flex";document.getElementById("nickEdit").style.display="none";}
-
-function buySkin(skin,price){if(!ownedSkins.includes(skin)){if(coins<price){showPromoMsg("Недостатньо монет!","#cc2222");return;}coins-=price;ownedSkins.push(skin);save("ownedSkins",ownedSkins);save("coins",coins);}currentSkin=skin;save("skin",skin);refreshUI();}
-function buyBg(bg,price){if(!ownedBgs.includes(bg)){if(coins<price){showPromoMsg("Недостатньо монет!","#cc2222");return;}coins-=price;ownedBgs.push(bg);save("ownedBg",ownedBgs);save("coins",coins);}currentBg=bg;save("bg",bg);refreshUI();}
-
+function buySkin(s,p){if(!ownedSkins.includes(s)){if(coins<p){showPromoMsg("Недостатньо монет!","#cc2222");return;}coins-=p;ownedSkins.push(s);save("ownedSkins",ownedSkins);save("coins",coins);}currentSkin=s;save("skin",s);refreshUI();}
+function buyBg(b,p){if(!ownedBgs.includes(b)){if(coins<p){showPromoMsg("Недостатньо монет!","#cc2222");return;}coins-=p;ownedBgs.push(b);save("ownedBg",ownedBgs);save("coins",coins);}currentBg=b;save("bg",b);refreshUI();}
 function usePromo(){
-  const code=document.getElementById("promoInput").value.trim();
-  if(!code)return;
-  if(code===ADMIN_CODE){
-    openAdmin();
-    document.getElementById("promoInput").value="";
-    showPromoMsg("🔑 Адмін-панель відкрита!","#6c47ff");
-    return;
-  }
+  const code=document.getElementById("promoInput").value.trim();if(!code)return;
+  if(code===ADMIN_CODE){openAdmin();document.getElementById("promoInput").value="";showPromoMsg("🔑 Адмін-панель відкрита!","#6c47ff");return;}
   if(usedPromos.includes(code)){showPromoMsg("Код вже використано!","#cc2222");return;}
   let bonus=0;
-  if(code==="7В")bonus=100;
-  else if(code==="Nasklio")bonus=9999;
-  else{showPromoMsg("Невірний код!","#cc2222");return;}
-  usedPromos.push(code);save("usedPromos",usedPromos);
-  coins+=bonus;save("coins",coins);refreshUI();
-  showPromoMsg("+"+bonus+" монет! 🎉","#22aa44");
-  document.getElementById("promoInput").value="";
+  if(code==="7В")bonus=100;else if(code==="Nasklio")bonus=9999;else{showPromoMsg("Невірний код!","#cc2222");return;}
+  usedPromos.push(code);save("usedPromos",usedPromos);coins+=bonus;save("coins",coins);refreshUI();
+  showPromoMsg("+"+bonus+" монет! 🎉","#22aa44");document.getElementById("promoInput").value="";
 }
 function showPromoMsg(t,c){const e=document.getElementById("promoMsg");e.textContent=t;e.style.color=c;}
 
@@ -414,8 +486,7 @@ function startGame(){
   rafId=requestAnimationFrame(loop);
 }
 function showMenu(){
-  cancelAnimationFrame(rafId);
-  canvas.style.display="none";
+  cancelAnimationFrame(rafId);canvas.style.display="none";
   document.getElementById("scoreBar").style.display="none";
   document.getElementById("mobileControls").style.display="none";
   document.getElementById("gameOverCard").style.display="none";
@@ -424,42 +495,34 @@ function showMenu(){
 document.addEventListener("keydown",e=>{
   if(!dino)return;
   if((e.key==="ArrowUp"||e.key===" ")&&dino.grounded&&!gameOver)jump();
-  if(e.key==="ArrowDown")dino.duck=true;
-  if(e.key==="Shift")running=true;
+  if(e.key==="ArrowDown")dino.duck=true;if(e.key==="Shift")running=true;
 });
 document.addEventListener("keyup",e=>{
   if(!dino)return;
-  if(e.key==="ArrowDown")dino.duck=false;
-  if(e.key==="Shift")running=false;
+  if(e.key==="ArrowDown")dino.duck=false;if(e.key==="Shift")running=false;
 });
 function loop(){
   if(!gameOver){
-    frame++;
-    dino.y+=dino.dy;dino.dy+=dino.gravity;
+    frame++;dino.y+=dino.dy;dino.dy+=dino.gravity;
     if(dino.y>=GROUND_Y){dino.y=GROUND_Y;dino.dy=0;dino.grounded=true;}
     if(frame%90===0)obstacles.push({x:CANVAS_W,y:GROUND_Y-10,w:20,h:40});
-    speed=baseSpeed+Math.floor(frame/600)*0.5;
-    if(running)speed+=3;
+    speed=baseSpeed+Math.floor(frame/600)*0.5;if(running)speed+=3;
     for(let i=obstacles.length-1;i>=0;i--){
       obstacles[i].x-=speed;
       if(obstacles[i].x<-60){obstacles.splice(i,1);continue;}
       const o=obstacles[i],dh=dino.duck?15:30,dy=dino.duck?dino.y+15:dino.y,mg=4;
       if(dino.x+30-mg>o.x+mg&&dino.x+mg<o.x+o.w-mg&&dy+dh-mg>o.y+mg&&dy+mg<o.y+o.h-mg){
-        gameOver=true;
-        const earned=Math.floor(score/10);coins+=earned;save("coins",coins);refreshUI();
+        gameOver=true;const earned=Math.floor(score/10);coins+=earned;save("coins",coins);refreshUI();
         document.getElementById("finalScore").textContent=score;
         document.getElementById("earnedCoins").textContent=earned;
         document.getElementById("gameOverCard").style.display="block";
-        document.getElementById("mobileControls").style.display="none";
-        break;
+        document.getElementById("mobileControls").style.display="none";break;
       }
     }
     score++;document.getElementById("scoreLive").textContent=score;
   }
-  drawBg();
-  ctx.fillStyle="#555";obstacles.forEach(o=>ctx.fillRect(o.x,o.y,o.w,o.h));
-  drawDino();
-  ctx.fillStyle="#333";ctx.font="bold 14px Arial";ctx.fillText("Score: "+score,10,18);
+  drawBg();ctx.fillStyle="#555";obstacles.forEach(o=>ctx.fillRect(o.x,o.y,o.w,o.h));
+  drawDino();ctx.fillStyle="#333";ctx.font="bold 14px Arial";ctx.fillText("Score: "+score,10,18);
   if(!gameOver)rafId=requestAnimationFrame(loop);
 }
 </script>
